@@ -128,12 +128,12 @@ function initialize(){
 	function onError(xhr) { console.log( 'An error happened' ); }
 
     new THREE.MTLLoader()
-		.setPath( '/models/' )
+		.setPath( 'models/' )
 		.load( 'nomad.mtl', function ( materials ) {
 			materials.preload();
 			new THREE.OBJLoader()
 				.setMaterials( materials )
-				.setPath( '/models/' )
+				.setPath( 'models/' )
 				.load( 'nomad.obj', function ( group ) {
 					mesh0 = group.children[0];
 					mesh0.material.side = THREE.DoubleSide;
