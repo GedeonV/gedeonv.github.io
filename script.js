@@ -124,17 +124,25 @@ function initialize(){
     // const dracoLoader = new THREE.DRACOLoader()
     // dracoLoader.setDecoderPath('/draco/')
 
-    const gltfLoader = new THREE.GLTFLoader()
-    // gltfLoader.setDRACOLoader(dracoLoader)
+    function onProgress(xhr) { console.log( (xhr.loaded / xhr.total * 100) + '% loaded' ); }
+	function onError(xhr) { console.log( 'An error happened' ); }
 
-    gltfLoader.load(
-        '/models/nomad.glb',
-        (gltf) =>
-        {   
-            gltf.scene.position.y = 1;
-            markerRoot1.add(gltf.scene)
-        }
-    )
+    new THREE.MTLLoader()
+		.setPath( '/models/' )
+		.load( 'nomad.mtl', function ( materials ) {
+			materials.preload();
+			new THREE.OBJLoader()
+				.setMaterials( materials )
+				.setPath( '/models/' )
+				.load( 'nomad.obj', function ( group ) {
+					mesh0 = group.children[0];
+					mesh0.material.side = THREE.DoubleSide;
+					mesh0.position.y = 0.25;
+					mesh0.scale.set(0.25,0.25,0.25);
+					markerRoot1.add(mesh0);
+				}, onProgress, onError );
+		});
+    
 
     let pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
     pointLight.position.set(0.5,3,2);
