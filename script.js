@@ -103,7 +103,7 @@ function initialize(){
      */
 
     arToolkitContext = new THREEx.ArToolkitContext({
-        cameraParametersUrl: 'data/camera_para.dat',
+        cameraParametersUrl: '/data/camera_para.dat',
         detectionMode: 'mono'
     });
 
@@ -118,14 +118,14 @@ function initialize(){
     markerRoot1 = new THREE.Group();
     scene.add(markerRoot1);
     let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
-        type: 'pattern', patternUrl: "data/hiro.patt",
+        type: 'pattern', patternUrl: "/data/hiro.patt",
     })
 
-    const dracoLoader = new THREE.DRACOLoader()
-    dracoLoader.setDecoderPath('/draco/')
+    // const dracoLoader = new THREE.DRACOLoader()
+    // dracoLoader.setDecoderPath('/draco/')
 
     const gltfLoader = new THREE.GLTFLoader()
-    gltfLoader.setDRACOLoader(dracoLoader)
+    // gltfLoader.setDRACOLoader(dracoLoader)
 
     gltfLoader.load(
         '/models/nomad.glb',
