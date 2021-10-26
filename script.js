@@ -135,11 +135,9 @@ function initialize(){
 				.setMaterials( materials )
 				.setPath( 'models/' )
 				.load( 'nomad.obj', function ( group ) {
-					mesh0 = group.children[0];
-					mesh0.material.side = THREE.DoubleSide;
-					mesh0.position.y = 0.25;
-					mesh0.scale.set(0.25,0.25,0.25);
-					markerRoot1.add(mesh0);
+                    group.position.y = 0.25
+                    group.scale.set(0.25, 0.25, 0.25)
+					markerRoot1.add(group);
 				}, onProgress, onError );
 		});
     
