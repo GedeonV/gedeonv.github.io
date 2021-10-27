@@ -40,7 +40,7 @@ function initialize(){
     /**
      * Renderer
      */
-    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true});
+    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true, logarithmicDepthBuffer: true});
 	renderer.setSize(1280, 960);
 
     renderer.domElement.style.position = 'absolute'
