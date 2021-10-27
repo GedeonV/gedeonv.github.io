@@ -64,10 +64,11 @@ function initialize(){
 
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType : 'webcam',
-        // sourceWidth: 1280,
-        // sourceHeight: 960,
-        // displayWidth: 1280,
-        // displayHeight: 960
+        sourceWidth: 1280,
+        sourceHeight: 960,
+        
+        displayWidth: 1280,
+        displayHeight: 960
     });
 
     function onResize()
