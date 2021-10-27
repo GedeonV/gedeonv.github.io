@@ -153,6 +153,7 @@ function initialize(){
                             var arrayLen = node.material.length;
                             for(var i=0; i<arrayLen; i++) {
                                 node.material[i].side = THREE.DoubleSide;
+                                console.log(node.material[i])
                             }
                         }
                     })
