@@ -32,15 +32,9 @@ function initialize(){
 
     /**
      * Camera
-     */
+     */    
 
-    const sizes = {
-        width: window.innerWidth,
-        height: window.innerHeight
-    }
-    
-
-    camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+    camera = new THREE.PerspectiveCamera()
     scene.add(camera)
 
     /**
