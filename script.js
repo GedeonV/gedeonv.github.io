@@ -15,8 +15,6 @@ var arToolkitSource, arToolkitContext;
 
 var markerRoot1;
 
-var mesh1;
-
 initialize();
 animate();
 
@@ -36,7 +34,13 @@ function initialize(){
      * Camera
      */
 
-    camera = new THREE.Camera()
+    const sizes = {
+        width: window.innerWidth,
+        height: window.innerHeight
+    }
+    
+
+    camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
     scene.add(camera)
 
     /**
@@ -96,8 +100,6 @@ function initialize(){
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: '/data/camera_para.dat',
         detectionMode: 'mono',
-        canvasWidth: 1280,
-        canvasHeight: 960,
     });
 
     arToolkitContext.init( function onCompleted(){
