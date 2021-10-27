@@ -142,9 +142,14 @@ function initialize(){
                     let mesh1 = group.children[0].material
                     let mesh2 = group.children[0].material
 
-                    Object.entries(mesh1).forEach(el => {
-                        console.log(el)
-                    }) 
+
+                    mesh1.traverse(function(node){
+                        console.log(node)
+                    })
+
+                    // Object.entries(mesh1).forEach(el => {
+                    //     console.log(el)
+                    // }) 
                     
 
                     console.log(mesh1, mesh2)
