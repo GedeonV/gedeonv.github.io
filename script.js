@@ -28,7 +28,7 @@ function initialize(){
     /**
      * Lights
      */
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
+    const ambientLight = new THREE.AmbientLight(0xcccccc, 1.0)
     scene.add(ambientLight)
 
 
@@ -124,7 +124,7 @@ function initialize(){
     gltfLoader.setDRACOLoader(dracoLoader)
 
     gltfLoader.load(        
-        'models/nomad.glb',
+        'models/hamburger.glb',
             (gltf) =>
             {
                 gltf.scene.scale.set(1, 1, 1)
@@ -132,18 +132,6 @@ function initialize(){
                 markerRoot1.add(gltf.scene)
             }
         )
-    
-
-    // let pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
-    // pointLight.position.set(0.5,3,2);
-    // pointLight.add( 
-    //     new THREE.Mesh( 
-    //         new THREE.SphereBufferGeometry( 0.05, 16,8 ), 
-    //         new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.5 }) 
-    //     ) 
-    // );
-    // markerRoot1.add( pointLight );
-
 }
 
 function update()
