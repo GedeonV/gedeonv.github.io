@@ -143,7 +143,7 @@ function initialize(){
                     let mesh2 = group.children[0].material
 
 
-                    mesh1.traverse(function(node){
+                    group.traverse(function(node){
                         console.log(node)
                     })
 
