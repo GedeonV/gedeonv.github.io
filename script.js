@@ -143,7 +143,7 @@ function initialize(){
                     let mesh2 = group.children[0].material
 
                     Object.entries(mesh1).forEach(el => {
-                        console.log(el.side)
+                        console.log(el)
                     }) 
                     
 
