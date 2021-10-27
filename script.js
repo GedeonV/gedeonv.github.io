@@ -125,39 +125,52 @@ function initialize(){
         type: 'pattern', patternUrl: "/data/nomad.patt", smooth: true,
     })
 
-    // const dracoLoader = new THREE.DRACOLoader()
-    // dracoLoader.setDecoderPath('/draco/')
+    const dracoLoader = new THREE.DRACOLoader()
+    dracoLoader.setDecoderPath('/draco/')
 
     function onProgress(xhr) { console.log( (xhr.loaded / xhr.total * 100) + '% loaded' ); }
 	function onError(xhr) { console.log( 'An error happened' ); }
 
-    new THREE.MTLLoader()
-		.setPath( 'models/' )
-		.load( 'nomad.mtl', function ( materials ) {
-			materials.preload();
-			new THREE.OBJLoader()
-				.setMaterials( materials )
-				.setPath( 'models/' )
-				.load( 'nomad.obj', function ( group ) {
-                    group.traverse(function(node){
-                        if(node.material !== undefined){
-                            node.material.side = THREE.DoubleSide
-                        }
-                        
-                        if(node.material instanceof Array){
-                            var arrayLen = node.material.length;
-                            for(var i=0; i<arrayLen; i++) {
-                                node.material[i].side = THREE.DoubleSide;
-                                console.log(node.material[i])
-                            }
-                        }
-                    })
+
+    gltfLoader.load(        
+        'models/nomad.glb',
+            (gltf) =>
+            {
+                gltf.scene.scale.set(0.3, 0.3, 0.3)
+                gltf.scene.position.set(0, - 1, 0)
+                markerRoot1.add(gltf.scene)
+            }
+        )
+
+
+
+    // new THREE.MTLLoader()
+    // .setPath( 'models/' )
+    // .load( 'nomad.mtl', function ( materials ) {
+    //     materials.preload();
+    //     new THREE.OBJLoader()
+    //         .setMaterials( materials )
+    //         .setPath( 'models/' )
+    //         .load( 'nomad.obj', function ( group ) {
+    //             group.traverse(function(node){
+    //                 if(node.material !== undefined){
+    //                     node.material.side = THREE.DoubleSide
+    //                 }
                     
-                    group.position.y = 0.25
-                    group.scale.set(1.25, 1.25, 1.25)
-					markerRoot1.add(group);
-				}, onProgress, onError );
-		});
+    //                 if(node.material instanceof Array){
+    //                     var arrayLen = node.material.length;
+    //                     for(var i=0; i<arrayLen; i++) {
+    //                         node.material[i].side = THREE.DoubleSide;
+    //                         console.log(node.material[i])
+    //                     }
+    //                 }
+    //             })
+                
+    //             group.position.y = 0.25
+    //             group.scale.set(1.25, 1.25, 1.25)
+    //             markerRoot1.add(group);
+    //         }, onProgress, onError );
+    // });
     
 
     let pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
