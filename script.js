@@ -139,6 +139,7 @@ function initialize(){
 				.setMaterials( materials )
 				.setPath( 'models/' )
 				.load( 'nomad.obj', function ( group ) {
+                    console.log(group)
                     group.children[0].material.side = THREE.DoubleSide;
                     group.children[1].material.side = THREE.DoubleSide;
                     group.position.y = 0.25
