@@ -124,7 +124,7 @@ function initialize(){
         'models/nomad.glb',
             (gltf) =>
             {
-                gltf.scene.scale.set(1.25, 1.25, 1.25)
+                gltf.scene.scale.set(1, 1, 1)
                 gltf.scene.position.y = 0.25
                 markerRoot1.add(gltf.scene)
             }
