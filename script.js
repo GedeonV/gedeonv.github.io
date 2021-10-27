@@ -42,11 +42,8 @@ function initialize(){
     /**
      * Renderer
      */
-    renderer = new THREE.WebGLRenderer({alpha: true});
-    renderer.shadowMap.enabled = true
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap
-	renderer.setSize( window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true});
+	renderer.setSize( 640, 480);
 
     renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
@@ -114,14 +111,14 @@ function initialize(){
         type: 'pattern', patternUrl: "/data/nomad.patt", smooth: true,
     })
 
-    //const dracoLoader = new THREE.DRACOLoader()
-    //dracoLoader.setDecoderPath('/draco/')
+    const dracoLoader = new THREE.DRACOLoader()
+    dracoLoader.setDecoderPath('/draco/')
 
     function onProgress(xhr) { console.log( (xhr.loaded / xhr.total * 100) + '% loaded' ); }
 	function onError(xhr) { console.log( 'An error happened' ); }
 
     const gltfLoader = new THREE.GLTFLoader()
-    //gltfLoader.setDRACOLoader(dracoLoader)
+    gltfLoader.setDRACOLoader(dracoLoader)
 
     gltfLoader.load(        
         'models/nomad.glb',
