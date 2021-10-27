@@ -131,7 +131,7 @@ function initialize(){
     function onProgress(xhr) { console.log( (xhr.loaded / xhr.total * 100) + '% loaded' ); }
 	function onError(xhr) { console.log( 'An error happened' ); }
 
-
+    const gltfLoader = new THREE.GLTFLoader()
     gltfLoader.load(        
         'models/nomad.glb',
             (gltf) =>
