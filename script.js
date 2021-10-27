@@ -58,7 +58,7 @@ function initialize(){
 		alpha: true
 	});
 	renderer.setClearColor(new THREE.Color('lightgrey'), 0)
-	renderer.setSize( 640, 480 );
+	renderer.setSize( 1280, 960 );
 	renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
 	renderer.domElement.style.left = '0px'
@@ -78,6 +78,10 @@ function initialize(){
 
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType : 'webcam',
+        sourceWidth: 1280,
+        sourceHeight: 960,
+        displayWidth: 1280,
+        displayHeight: 960
     });
 
     function onResize()
@@ -118,7 +122,7 @@ function initialize(){
     markerRoot1 = new THREE.Group();
     scene.add(markerRoot1);
     let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
-        type: 'pattern', patternUrl: "/data/hiro.patt",
+        type: 'pattern', patternUrl: "/data/hiro.patt", smooth: true,
     })
 
     // const dracoLoader = new THREE.DRACOLoader()
