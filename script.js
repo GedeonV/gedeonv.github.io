@@ -50,9 +50,9 @@ function initialize(){
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
 	
     renderer.setClearColor(new THREE.Color('0x000000'), 0)
-	renderer.setSize( 1280, 960 );
+	renderer.setSize( window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    
+
     renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
 	renderer.domElement.style.left = '0px'
@@ -72,10 +72,10 @@ function initialize(){
 
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType : 'webcam',
-        sourceWidth: 1280,
-        sourceHeight: 960,
-        displayWidth: 1280,
-        displayHeight: 960
+        // sourceWidth: 1280,
+        // sourceHeight: 960,
+        // displayWidth: 1280,
+        // displayHeight: 960
     });
 
     function onResize()
