@@ -43,7 +43,7 @@ function initialize(){
      * Renderer
      */
     renderer = new THREE.WebGLRenderer({antialias : true, alpha: true});
-	renderer.setSize( 640, 480);
+	renderer.setSize(1280, 960);
 
     renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
@@ -66,7 +66,7 @@ function initialize(){
         sourceType : 'webcam',
         sourceWidth: 1280,
         sourceHeight: 960,
-        
+
         displayWidth: 1280,
         displayHeight: 960
     });
@@ -95,7 +95,9 @@ function initialize(){
 
     arToolkitContext = new THREEx.ArToolkitContext({
         cameraParametersUrl: '/data/camera_para.dat',
-        detectionMode: 'mono'
+        detectionMode: 'mono',
+        canvasWidth: 1280,
+        canvasHeight: 960,
     });
 
     arToolkitContext.init( function onCompleted(){
@@ -109,7 +111,7 @@ function initialize(){
     markerRoot1 = new THREE.Group();
     scene.add(markerRoot1);
     let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
-        type: 'pattern', patternUrl: "/data/nomad.patt", smooth: true,
+        type: 'pattern', patternUrl: "/data/nomad.patt",
     })
 
     const dracoLoader = new THREE.DRACOLoader()
