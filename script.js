@@ -139,14 +139,9 @@ function initialize(){
 				.setMaterials( materials )
 				.setPath( 'models/' )
 				.load( 'nomad.obj', function ( group ) {
-                    let mesh1 = group.children[0].material
-                    let mesh2 = group.children[0].material
-
-
                     group.traverse(function(node){
                         if(node.material !== undefined){
                             node.material.side = THREE.DoubleSide
-                            console.log(node.material)
                         }
                         
                         if(node.material instanceof Array){
