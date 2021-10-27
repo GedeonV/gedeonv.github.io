@@ -30,17 +30,6 @@ function initialize(){
      */
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8)
     scene.add(ambientLight)
-    
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6)
-    directionalLight.castShadow = true
-    directionalLight.shadow.mapSize.set(1024, 1024)
-    directionalLight.shadow.camera.far = 15
-    directionalLight.shadow.camera.left = - 7
-    directionalLight.shadow.camera.top = 7
-    directionalLight.shadow.camera.right = 7
-    directionalLight.shadow.camera.bottom = - 7
-    directionalLight.position.set(5, 5, 5)
-    scene.add(directionalLight)
 
 
     /**
@@ -143,47 +132,17 @@ function initialize(){
                 markerRoot1.add(gltf.scene)
             }
         )
-
-
-
-    // new THREE.MTLLoader()
-    // .setPath( 'models/' )
-    // .load( 'nomad.mtl', function ( materials ) {
-    //     materials.preload();
-    //     new THREE.OBJLoader()
-    //         .setMaterials( materials )
-    //         .setPath( 'models/' )
-    //         .load( 'nomad.obj', function ( group ) {
-    //             group.traverse(function(node){
-    //                 if(node.material !== undefined){
-    //                     node.material.side = THREE.DoubleSide
-    //                 }
-                    
-    //                 if(node.material instanceof Array){
-    //                     var arrayLen = node.material.length;
-    //                     for(var i=0; i<arrayLen; i++) {
-    //                         node.material[i].side = THREE.DoubleSide;
-    //                         console.log(node.material[i])
-    //                     }
-    //                 }
-    //             })
-                
-    //             group.position.y = 0.25
-    //             group.scale.set(1.25, 1.25, 1.25)
-    //             markerRoot1.add(group);
-    //         }, onProgress, onError );
-    // });
     
 
-    let pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
-    pointLight.position.set(0.5,3,2);
-    pointLight.add( 
-        new THREE.Mesh( 
-            new THREE.SphereBufferGeometry( 0.05, 16,8 ), 
-            new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.5 }) 
-        ) 
-    );
-    markerRoot1.add( pointLight );
+    // let pointLight = new THREE.PointLight( 0xffffff, 1, 100 );
+    // pointLight.position.set(0.5,3,2);
+    // pointLight.add( 
+    //     new THREE.Mesh( 
+    //         new THREE.SphereBufferGeometry( 0.05, 16,8 ), 
+    //         new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.5 }) 
+    //     ) 
+    // );
+    // markerRoot1.add( pointLight );
 
 }
 
