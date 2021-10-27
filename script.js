@@ -144,16 +144,18 @@ function initialize(){
 
 
                     group.traverse(function(node){
-                        console.log(node)
+                        if(node.material !== undefined){
+                            node.material.side = THREE.DoubleSide
+                            console.log(node.material)
+                        } else if(node.material instanceof Array) {
+                            
+                            var arrayLen = node.material.length;
+                            for(var i=0; i<arrayLen; i++) {
+                                node.material[i].side = THREE.DoubleSide;
+                            }
+                        }
                     })
-
-                    // Object.entries(mesh1).forEach(el => {
-                    //     console.log(el)
-                    // }) 
                     
-
-                    console.log(mesh1, mesh2)
-
                     group.position.y = 0.25
                     group.scale.set(1.25, 1.25, 1.25)
 					markerRoot1.add(group);
