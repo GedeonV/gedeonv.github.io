@@ -46,9 +46,14 @@ function initialize(){
 		antialias : true,
 		alpha: true
 	});
-	renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+    renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+	
+    renderer.setClearColor(new THREE.Color('0x000000'), 0)
 	renderer.setSize( 1280, 960 );
-	renderer.domElement.style.position = 'absolute'
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    
+    renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
 	renderer.domElement.style.left = '0px'
 	document.body.appendChild( renderer.domElement );
