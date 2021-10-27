@@ -110,14 +110,14 @@ function initialize(){
         type: 'pattern', patternUrl: "/data/nomad.patt",
     })
 
-    const dracoLoader = new THREE.DRACOLoader()
-    dracoLoader.setDecoderPath('/draco/')
+    //const dracoLoader = new THREE.DRACOLoader()
+    //dracoLoader.setDecoderPath('/draco/')
 
     function onProgress(xhr) { console.log( (xhr.loaded / xhr.total * 100) + '% loaded' ); }
 	function onError(xhr) { console.log( 'An error happened' ); }
 
     const gltfLoader = new THREE.GLTFLoader()
-    gltfLoader.setDRACOLoader(dracoLoader)
+    //gltfLoader.setDRACOLoader(dracoLoader)
 
     gltfLoader.load(        
         'models/hamburger.glb',
