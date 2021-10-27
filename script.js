@@ -141,12 +141,10 @@ function initialize(){
 				.load( 'nomad.obj', function ( group ) {
                     let mesh1 = group.children[0].material
                     let mesh2 = group.children[0].material
-                    console.log(typeof mesh1)
 
-
-                    mesh1.foreEach((el => {
+                    Object.entries(mesh1).forEach(el => {
                         console.log(el.side)
-                    }))
+                    }) 
                     
 
                     console.log(mesh1, mesh2)
