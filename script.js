@@ -139,14 +139,12 @@ function initialize(){
 				.setMaterials( materials )
 				.setPath( 'models/' )
 				.load( 'nomad.obj', function ( group ) {
-                    console.log(group)
-                    group.children[0].material.forEach(m => {
-                        m.side = THREE.DoubleSide
-                    })
-                    
-                    group.children[1].material.forEach(m => {
-                        m.side = THREE.DoubleSide
-                    })
+                    let mesh1 = group.children[0].material
+
+                    let mesh2 = group.children[0].material
+
+                    console.log(mesh1, mesh2)
+
                     group.position.y = 0.25
                     group.scale.set(1.25, 1.25, 1.25)
 					markerRoot1.add(group);
