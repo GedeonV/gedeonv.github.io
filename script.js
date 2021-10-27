@@ -90,7 +90,7 @@ function initialize(){
         arToolkitSource.copyElementSizeTo(renderer.domElement)	
         if ( arToolkitContext.arController !== null )
         {
-            arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)	
+            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas)	
         }	
     }
 
