@@ -42,7 +42,7 @@ function initialize(){
     /**
      * Renderer
      */
-    renderer = new THREE.WebGLRenderer({});
+    renderer = new THREE.WebGLRenderer({alpha: true});
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
 	renderer.setSize( window.innerWidth, window.innerHeight);
@@ -120,7 +120,7 @@ function initialize(){
     function onProgress(xhr) { console.log( (xhr.loaded / xhr.total * 100) + '% loaded' ); }
 	function onError(xhr) { console.log( 'An error happened' ); }
 
-    //const gltfLoader = new THREE.GLTFLoader()
+    const gltfLoader = new THREE.GLTFLoader()
     //gltfLoader.setDRACOLoader(dracoLoader)
 
     gltfLoader.load(        
