@@ -86,7 +86,7 @@ function initialize(){
 
     function onResize()
     {
-        arToolkitSource.onResizeElement
+        arToolkitSource.onResizeElement()
         arToolkitSource.copyElementSizeTo(renderer.domElement)	
         if ( arToolkitContext.arController !== null )
         {
