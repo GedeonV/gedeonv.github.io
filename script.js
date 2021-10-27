@@ -43,8 +43,8 @@ function initialize(){
      * Renderer
      */
     renderer = new THREE.WebGLRenderer({
-		antialias : true,
-		alpha: true
+		//antialias : true,
+		//alpha: true
 	});
     renderer.shadowMap.enabled = true
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
