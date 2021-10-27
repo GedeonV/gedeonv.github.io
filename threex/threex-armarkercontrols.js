@@ -21,6 +21,14 @@ ARjs.MarkerControls = THREEx.ArMarkerControls = function(context, object3d, para
 		changeMatrixMode : 'modelViewMatrix',
 		// minimal confidence in the marke recognition - between [0, 1] - default to 1
 		minConfidence: 0.6,
+		// turn on/off camera smoothing
+		smooth: false,
+		// number of matrices to smooth tracking over, more = smoother but slower follow
+		smoothCount: 5,
+		// distance tolerance for smoothing, if smoothThreshold # of matrices are under tolerance, tracking will stay still
+		smoothTolerance: 0.01,
+		// threshold for smoothing, will keep still unless enough matrices are over tolerance
+		smoothThreshold: 2,
 	}
 
 	// sanity check
@@ -60,6 +68,10 @@ ARjs.MarkerControls = THREEx.ArMarkerControls = function(context, object3d, para
 		}
 	}
 
+	if (this.parameters.smooth) {
+		this.smoothMatrices = []; // last DEBOUNCE_COUNT modelViewMatrix
+	}
+
 	//////////////////////////////////////////////////////////////////////////////
 	//		Code Separator
 	//////////////////////////////////////////////////////////////////////////////
@@ -69,12 +81,6 @@ ARjs.MarkerControls = THREEx.ArMarkerControls = function(context, object3d, para
 
 	if( _this.context.parameters.trackingBackend === 'artoolkit' ){
 		this._initArtoolkit()
-	}else if( _this.context.parameters.trackingBackend === 'aruco' ){
-		// TODO create a ._initAruco
-		// put aruco second
-		this._arucoPosit = new POS.Posit(this.parameters.size, _this.context.arucoContext.canvas.width)
-	}else if( _this.context.parameters.trackingBackend === 'tango' ){
-		this._initTango()
 	}else console.assert(false)
 }
 
@@ -108,23 +114,55 @@ ARjs.MarkerControls.prototype.updateWithModelViewMatrix = function(modelViewMatr
 		tmpMatrix.multiply(modelViewMatrix)
 
 		modelViewMatrix.copy(tmpMatrix)
-	}else if( this.context.parameters.trackingBackend === 'aruco' ){
-		// ...
-	}else if( this.context.parameters.trackingBackend === 'tango' ){
-		// ...
 	}else console.assert(false)
 
+	// change axis orientation on marker - artoolkit say Z is normal to the marker - ar.js say Y is normal to the marker
+	var markerAxisTransformMatrix = new THREE.Matrix4().makeRotationX(Math.PI/2)
+	modelViewMatrix.multiply(markerAxisTransformMatrix)
 
-	if( this.context.parameters.trackingBackend !== 'tango' ){
-
-		// change axis orientation on marker - artoolkit say Z is normal to the marker - ar.js say Y is normal to the marker
-		var markerAxisTransformMatrix = new THREE.Matrix4().makeRotationX(Math.PI/2)
-		modelViewMatrix.multiply(markerAxisTransformMatrix)
-	}
+	var renderReqd = false;
 
 	// change markerObject3D.matrix based on parameters.changeMatrixMode
 	if( this.parameters.changeMatrixMode === 'modelViewMatrix' ){
-		markerObject3D.matrix.copy(modelViewMatrix)
+		if (this.parameters.smooth) {
+			var sum,
+					i, j,
+					averages, // average values for matrix over last smoothCount
+					exceedsAverageTolerance = 0;
+
+			this.smoothMatrices.push(modelViewMatrix.elements.slice()); // add latest
+
+			if (this.smoothMatrices.length < (this.parameters.smoothCount + 1)) {
+				markerObject3D.matrix.copy(modelViewMatrix); // not enough for average
+			} else {
+				this.smoothMatrices.shift(); // remove oldest entry
+				averages = [];
+
+				for (i in modelViewMatrix.elements) { // loop over entries in matrix
+					sum = 0;
+					for (j in this.smoothMatrices) { // calculate average for this entry
+						sum += this.smoothMatrices[j][i];
+					}
+					averages[i] = sum / this.parameters.smoothCount;
+					// check how many elements vary from the average by at least AVERAGE_MATRIX_TOLERANCE
+					if (Math.abs(averages[i] - modelViewMatrix.elements[i]) >= this.parameters.smoothTolerance) {
+						exceedsAverageTolerance++;
+					}
+				}
+
+				// if moving (i.e. at least AVERAGE_MATRIX_THRESHOLD entries are over AVERAGE_MATRIX_TOLERANCE)
+				if (exceedsAverageTolerance >= this.parameters.smoothThreshold) {
+					// then update matrix values to average, otherwise, don't render to minimize jitter
+					for (i in modelViewMatrix.elements) {
+						modelViewMatrix.elements[i] = averages[i];
+					}
+					markerObject3D.matrix.copy(modelViewMatrix);
+					renderReqd = true; // render required in animation loop
+				}
+			}
+		} else {
+			markerObject3D.matrix.copy(modelViewMatrix)
+		}
 	}else if( this.parameters.changeMatrixMode === 'cameraTransformMatrix' ){
 		markerObject3D.matrix.getInverse( modelViewMatrix )
 	}else {
@@ -136,6 +174,8 @@ ARjs.MarkerControls.prototype.updateWithModelViewMatrix = function(modelViewMatr
 
 	// dispatchEvent
 	this.dispatchEvent( { type: 'markerFound' } );
+
+	return renderReqd;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -222,24 +262,9 @@ ARjs.MarkerControls.prototype._initArtoolkit = function(){
 	function onMarkerFound(event){
 		// honor his.parameters.minConfidence
 		if( event.data.type === artoolkit.PATTERN_MARKER && event.data.marker.cfPatt < _this.parameters.minConfidence )	return
-		if( event.data.type === artoolkit.BARCODE_MARKER && event.data.marker.cfMatt < _this.parameters.minConfidence )	return
+		if( event.data.type === artoolkit.BARCODE_MARKER && event.data.marker.cfMatrix < _this.parameters.minConfidence )	return
 
 		var modelViewMatrix = new THREE.Matrix4().fromArray(event.data.matrix)
 		_this.updateWithModelViewMatrix(modelViewMatrix)
 	}
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//		aruco specific
-//////////////////////////////////////////////////////////////////////////////
-ARjs.MarkerControls.prototype._initAruco = function(){
-	this._arucoPosit = new POS.Posit(this.parameters.size, _this.context.arucoContext.canvas.width)
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//		init for Artoolkit
-//////////////////////////////////////////////////////////////////////////////
-ARjs.MarkerControls.prototype._initTango = function(){
-	var _this = this
-	console.log('init tango ArMarkerControls')
 }
