@@ -18,7 +18,8 @@
 	<script src="threex/threex-armarkercontrols.js"></script>
 	<script>
 			var camera
-			document.body.addEventListener('loaded', () => {
+			let el = document.querySelector('body')
+			el.addEventListener('loaded', () => {
 				camera = new THREE.Camera();
 			})
 	</script>
