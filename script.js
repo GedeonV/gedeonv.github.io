@@ -15,12 +15,8 @@ var arToolkitSource, arToolkitContext;
 
 var markerRoot1;
 
-let el = document.querySelector('body')
-el.addEventListener('loaded', () => {
-    initialize();
-    animate();
-})
-
+initialize();
+animate();
 
 function initialize(){
     // Scene
