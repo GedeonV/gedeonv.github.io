@@ -34,15 +34,14 @@ function initialize(){
      * Camera
      */    
 
-    camera = new THREE.Camera()
-    scene.add(camera)
+    camera = new THREE.Camera();
+    scene.add(camera);
 
     /**
      * Renderer
      */
     renderer = new THREE.WebGLRenderer({antialias : true, alpha: true, logarithmicDepthBuffer: true});
-	renderer.setSize(1280, 960);
-
+	renderer.setSize(640, 480);
     renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
 	renderer.domElement.style.left = '0px'
@@ -62,11 +61,11 @@ function initialize(){
 
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType : 'webcam',
-        sourceWidth: 1280,
-        sourceHeight: 960,
+        // sourceWidth: 1280,
+        // sourceHeight: 960,
 
-        displayWidth: 1280,
-        displayHeight: 960
+        // displayWidth: 1280,
+        // displayHeight: 960
     });
 
     function onResize()
