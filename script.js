@@ -15,8 +15,12 @@ var arToolkitSource, arToolkitContext;
 
 var markerRoot1;
 
-initialize();
-animate();
+document.addEventListener('DOMContentLoaded', function(evt) {
+    initialize();
+    animate();
+})
+
+
 
 function initialize(){
     // Scene
@@ -40,7 +44,7 @@ function initialize(){
     /**
      * Renderer
      */
-    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true, logarithmicDepthBuffer: true});
+    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true});
 	renderer.setSize(640, 480);
     renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
