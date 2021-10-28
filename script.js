@@ -15,8 +15,10 @@ var arToolkitSource, arToolkitContext;
 
 var markerRoot1;
 
-initialize();
-animate();
+document.addEventListener('DOMContentLoaded', (e) => {
+    initialize();
+    animate();
+})
 
 function initialize(){
     // Scene
@@ -62,11 +64,6 @@ function initialize(){
 
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType : 'webcam',
-        // sourceWidth: 1280,
-        // sourceHeight: 960,
-
-        // displayWidth: 1280,
-        // displayHeight: 960
     });
 
     function onResize()
@@ -80,7 +77,6 @@ function initialize(){
     }
 
     arToolkitSource.init(function onReady(){
-        console.log('hello')
         onResize()
     });
 
