@@ -9,7 +9,7 @@
  * Base
  */
 
-var scene, canvas, camera, renderer, clock, deltaTime, totalTime;
+var scene, camera, renderer, clock, deltaTime, totalTime;
 
 var arToolkitSource, arToolkitContext;
 
@@ -20,9 +20,6 @@ animate();
 
 function initialize(){
     // Scene
-
-    canvas = document.querySelector('canvas.webgl')
-
 
     scene = new THREE.Scene()
 
@@ -44,9 +41,12 @@ function initialize(){
     /**
      * Renderer
      */
-    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true, canvas: canvas});
-	renderer.setSize(640, 480)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true});
+	renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.position = 'absolute'
+	renderer.domElement.style.top = '0px'
+	renderer.domElement.style.left = '0px'
+	document.body.appendChild( renderer.domElement );
 
     /**
      * Animate
