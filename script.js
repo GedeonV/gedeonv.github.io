@@ -23,10 +23,6 @@ function initialize(){
 
     canvas = document.querySelector('canvas.webgl')
 
-    const sizes = {
-        width: window.innerWidth,
-        height: window.innerHeight
-    }
 
     scene = new THREE.Scene()
 
@@ -49,7 +45,7 @@ function initialize(){
      * Renderer
      */
     renderer = new THREE.WebGLRenderer({antialias : true, alpha: true, canvas: canvas});
-	renderer.setSize(sizes.width, sizes.height)
+	renderer.setSize(640, 480)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
     /**
