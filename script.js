@@ -40,7 +40,7 @@ function initialize(){
     /**
      * Renderer
      */
-    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true});
+    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true, logarithmicDepthBuffer: true});
 	renderer.setSize(640, 480);
     renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
@@ -70,11 +70,11 @@ function initialize(){
 
     function onResize()
     {
-        arToolkitSource.onResizeElement()
-        arToolkitSource.copyElementSizeTo(renderer.domElement)	
+        arToolkitSource.onResize()
+        arToolkitSource.copySizeTo(renderer.domElement)	
         if ( arToolkitContext.arController !== null )
         {
-            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas)	
+            arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)	
         }	
     }
 
