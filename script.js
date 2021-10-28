@@ -34,7 +34,7 @@ function initialize(){
      * Camera
      */    
 
-    camera = new THREE.PerspectiveCamera()
+    camera = new THREE.Camera()
     scene.add(camera)
 
     /**
@@ -121,7 +121,7 @@ function initialize(){
     gltfLoader.setDRACOLoader(dracoLoader)
 
     gltfLoader.load(        
-        'models/hamburger.glb',
+        'models/nomad.glb',
             (gltf) =>
             {
                 gltf.scene.scale.set(1, 1, 1)
