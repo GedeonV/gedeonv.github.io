@@ -43,7 +43,7 @@ function initialize(){
     /**
      * Renderer
      */
-    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true});
+    renderer = new THREE.WebGLRenderer({antialias : true, alpha: true, logarithmicDepthBuffer: true});
 	renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.domElement.style.position = 'absolute'
 	renderer.domElement.style.top = '0px'
