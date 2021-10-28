@@ -37,7 +37,7 @@ function initialize(){
      * Camera
      */    
 
-    camera = new THREE.Camera();
+    camera = new THREE.PerspectiveCamera(70, 640 / 480, 1, 1000);
     scene.add(camera);
 
     /**
