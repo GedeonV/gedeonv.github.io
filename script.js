@@ -65,30 +65,25 @@ function initialize(){
 
     arToolkitSource = new THREEx.ArToolkitSource({
         sourceType : 'webcam',
-        // sourceWidth: 1280,
-        // sourceHeight: 960,
-
-        // displayWidth: 1280,
-        // displayHeight: 960
     });
 
     function onResize()
-    {
-        arToolkitSource.onResize()
-        arToolkitSource.copySizeTo(renderer.domElement)	
-        if ( arToolkitContext.arController !== null )
-        {
-            arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)	
-        }	
-    }
+	{
+		arToolkitSource.onResize()	
+		arToolkitSource.copySizeTo(renderer.domElement)	
+		if ( arToolkitContext.arController !== null )
+		{
+			arToolkitSource.copySizeTo(arToolkitContext.arController.canvas)	
+		}	
+	}
 
-    arToolkitSource.init(function onReady(){
-        onResize()
-    });
-
-    window.addEventListener('resize', function(){
-        onResize()
-    });
+	arToolkitSource.init(function onReady(){
+		onResize()
+	});
+	
+	window.addEventListener('resize', function(){
+		onResize()
+	});
 
     /**
      * Setup de arToolkitContext
@@ -100,8 +95,8 @@ function initialize(){
     });
 
     arToolkitContext.init( function onCompleted(){
-        camera.projectionMatrix.copy( arToolkitContext.getProjectionMatrix() );
-    });
+		camera.projectionMatrix.copy( arToolkitContext.getProjectionMatrix() );
+	});
 
     /**
      * Setup du marker
@@ -112,10 +107,6 @@ function initialize(){
     let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
         type: 'pattern', patternUrl: "/data/nomad.patt",
     })
-
-
-    function onProgress(xhr) { console.log( (xhr.loaded / xhr.total * 100) + '% loaded' ); }
-	function onError(xhr) { console.log( 'An error happened' ); }
 
     const gltfLoader = new THREE.GLTFLoader()
     const dracoLoader = new THREE.DRACOLoader()
