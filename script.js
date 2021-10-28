@@ -80,6 +80,7 @@ function initialize(){
     }
 
     arToolkitSource.init(function onReady(){
+        console.log('hello')
         onResize()
     });
 
