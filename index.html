@@ -16,11 +16,16 @@
 	<script src="threex/threex-artoolkitcontext.js"></script>
 	<script src="threex/threex-arbasecontrols.js"></script>
 	<script src="threex/threex-armarkercontrols.js"></script>
-
+	<script>
+			var camera
+			document.body.addEventListener('loaded', () => {
+				camera = new THREE.Camera();
+			})
+	</script>
 </head>
 <body>
     <script>
-		var scene, camera, renderer, clock, deltaTime, totalTime;
+		var scene, renderer, clock, deltaTime, totalTime;
 
 		var arToolkitSource, arToolkitContext;
 
@@ -37,9 +42,8 @@
 
 			let ambientLight = new THREE.AmbientLight( 0xcccccc, 1.0 );
 			scene.add( ambientLight );
-						
-			camera = new THREE.Camera();
-			scene.add(camera);
+			
+			
 
 			renderer = new THREE.WebGLRenderer({
 				antialias : true,
