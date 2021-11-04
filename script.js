@@ -29,7 +29,7 @@ function initialize(){
     /**
      * Lights
      */
-    const ambientLight = new THREE.AmbientLight(0xcccccc, 1.0)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
     scene.add(ambientLight)
 
 
@@ -122,7 +122,7 @@ function initialize(){
             (gltf) =>
             {
                 console.log(gltf)
-                gltf.scene.scale.set(0.25, 0.25, 0.25)
+                gltf.scene.scale.set(0.1, 0.1, 0.1)
                 gltf.scene.position.y = 0.25
                 markerRoot1.add(gltf.scene)
             }
