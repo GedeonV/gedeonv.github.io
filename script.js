@@ -29,7 +29,7 @@ function initialize(){
     /**
      * Lights
      */
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0)
+    const ambientLight = new THREE.AmbientLight(0xffffff, .4)
     scene.add(ambientLight)
 
 
@@ -37,7 +37,7 @@ function initialize(){
      * Camera
      */    
 
-    camera = new THREE.PerspectiveCamera(70, 640 / 480, 1, 1000);
+    camera = new THREE.PerspectiveCamera(135, 640 / 480, 1, 1000);
     scene.add(camera);
 
     /**
