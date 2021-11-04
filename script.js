@@ -121,6 +121,7 @@ function initialize(){
         'models/lezards.glb',
             (gltf) =>
             {
+                console.log(gltf)
                 gltf.scene.scale.set(1, 1, 1)
                 gltf.scene.position.y = 0.25
                 markerRoot1.add(gltf.scene)
