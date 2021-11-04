@@ -118,7 +118,7 @@ function initialize(){
     gltfLoader.setDRACOLoader(dracoLoader)
 
     gltfLoader.load(        
-        'models/nomad.glb',
+        'models/lezards.glb',
             (gltf) =>
             {
                 gltf.scene.scale.set(1, 1, 1)
