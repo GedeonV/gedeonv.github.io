@@ -29,7 +29,7 @@ function initialize(){
     /**
      * Lights
      */
-    const ambientLight = new THREE.AmbientLight(0xffffff, .4)
+    const ambientLight = new THREE.AmbientLight(0xffffff, .65)
     scene.add(ambientLight)
 
 
