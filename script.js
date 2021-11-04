@@ -104,7 +104,7 @@ function initialize(){
     markerRoot1 = new THREE.Group();
     scene.add(markerRoot1);
     let markerControls1 = new THREEx.ArMarkerControls(arToolkitContext, markerRoot1, {
-        type: 'pattern', patternUrl: "/data/lezards.patt",
+        type: 'pattern', patternUrl: "/data/nomad.patt",
     })
 
 
