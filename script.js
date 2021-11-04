@@ -122,7 +122,7 @@ function initialize(){
             (gltf) =>
             {
                 console.log(gltf)
-                gltf.scene.scale.set(1, 1, 1)
+                gltf.scene.scale.set(0.25, 0.25, 0.25)
                 gltf.scene.position.y = 0.25
                 markerRoot1.add(gltf.scene)
             }
