@@ -118,7 +118,7 @@ function initialize(){
     gltfLoader.setDRACOLoader(dracoLoader)
 
     gltfLoader.load(        
-        'models/lezards.glb',
+        'models/lezards_clean.glb',
             (gltf) =>
             {
                 console.log(gltf)
