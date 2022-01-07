@@ -5,6 +5,7 @@ import * as dat from 'dat.gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { Vector3 } from 'three'
+import gsap from 'gsap'
 
 console.log( THREE.REVISION );
 
@@ -12,7 +13,7 @@ console.log( THREE.REVISION );
  * Base
  */
 // Debug
-const gui = new dat.GUI()
+//const gui = new dat.GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -127,7 +128,7 @@ scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
-controls.target.set(0, 0.75, 0)
+//controls.target.set(0, 0.75, 0)
 controls.enableDamping = true
 
 window.addEventListener('click', () => {
@@ -145,10 +146,39 @@ window.addEventListener('click', () => {
 
         console.log(target)
 
-        controls.target.set(target.x, 0.5, target.z)
-        camera.zoom = 9
-        camera.updateProjectionMatrix();
+        gsap.to( controls.target, {
+            duration: 1,
+            x: target.x,
+            y: 0.8,
+            z: target.z,
+            onUpdate: function () {
+                controls.update();
+            }
+        });
+
+        gsap.to(controls, {
+            duration: 1,
+            minDistance: 2,
+            ease: 'power1.inOut',
+            onComplete: () => {
+                controls.maxDistance = 0
+                controls.autoRotate = true; 
+            },
+        })
+
+        
+
+        // gsap.to(camera, {duration: 1, zoom: 15, onUpdate: function(){
+        //     camera.updateMatrixWorld();
+        // }})
+
+        
     }
+})
+
+window.addEventListener('wheel', () => {
+    console.log(camera.zoom)
+    console.log(camera)
 })
 
 
