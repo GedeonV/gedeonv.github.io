@@ -40,12 +40,6 @@ function initialize(){
     camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
     scene.add(camera);
 
-    /**
-      * Controls
-      */ 
-    const controls = new THREE.OrbitControls(camera, canvas)
-    controls.target.set(0, 0.75, 0)
-    controls.enableDamping = true
 
     /**
      * Renderer
@@ -56,6 +50,13 @@ function initialize(){
 	renderer.domElement.style.top = '0px'
 	renderer.domElement.style.left = '0px'
 	document.body.appendChild( renderer.domElement );
+
+    /**
+     * Controls
+     */ 
+    const controls = new THREE.OrbitControls(camera, renderer.domElement)
+    controls.target.set(0, 0.75, 0)
+    controls.enableDamping = true     
 
     /**
      * Animate
