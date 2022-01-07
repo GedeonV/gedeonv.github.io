@@ -43,7 +43,7 @@ function initialize(){
     /**
       * Controls
       */ 
-    const controls = new OrbitControls(camera, canvas)
+    const controls = new THREE.OrbitControls(camera, canvas)
     controls.target.set(0, 0.75, 0)
     controls.enableDamping = true
 
