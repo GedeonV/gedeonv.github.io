@@ -7,13 +7,28 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { Vector3 } from 'three'
 import gsap from 'gsap'
 
-console.log( THREE.REVISION );
+console.log('VERSION: ', THREE.REVISION );
+
+THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+	console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+};
+
+THREE.DefaultLoadingManager.onLoad = function ( ) {
+	console.log( 'Loading Complete!');
+};
+
+THREE.DefaultLoadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+	console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+};
+
+THREE.DefaultLoadingManager.onError = function ( url ) {
+	console.log( 'There was an error loading ' + url );
+};
 
 /**
  * Base
  */
-// Debug
-//const gui = new dat.GUI()
+
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -42,7 +57,6 @@ gltfLoader.load('/models/rem.glb',
         {
             child.scale.set(0.025, 0.025, 0.025)
             if(child.name.includes('Pin')){
-                console.log(child.name)
                 pins.push(child)
             }
             scene.add(child)
@@ -50,6 +64,12 @@ gltfLoader.load('/models/rem.glb',
         }
         console.log(pins)
     },
+    (xhr) => {
+        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+    },
+    (error) => {
+        console.log( 'An error happened' );
+    }
 )
 
 /**
@@ -68,13 +88,6 @@ window.addEventListener('mousemove', (event) => {
     mouse.x = event.clientX / sizes.width * 2 - 1
     mouse.y = - (event.clientY / sizes.height) * 2 + 1
 })
-
-
-
-/**
- * Floor
- */
-
 
 /**
  * Lights
@@ -149,7 +162,7 @@ window.addEventListener('click', () => {
         gsap.to( controls.target, {
             duration: 1,
             x: target.x,
-            y: 0.8,
+            y: 1,
             z: target.z,
             onUpdate: function () {
                 controls.update();
@@ -164,21 +177,8 @@ window.addEventListener('click', () => {
                 controls.maxDistance = 0
                 controls.autoRotate = true; 
             },
-        })
-
-        
-
-        // gsap.to(camera, {duration: 1, zoom: 15, onUpdate: function(){
-        //     camera.updateMatrixWorld();
-        // }})
-
-        
+        })    
     }
-})
-
-window.addEventListener('wheel', () => {
-    console.log(camera.zoom)
-    console.log(camera)
 })
 
 
@@ -256,3 +256,4 @@ const tick = () =>
 }
 
 tick()
+
