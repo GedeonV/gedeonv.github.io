@@ -4,6 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'dat.gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+import { Vector3 } from 'three'
 
 console.log( THREE.REVISION );
 
@@ -19,6 +20,7 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+
 /**
  * Models 
  */
@@ -29,40 +31,25 @@ const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('/draco/')
 gltfLoader.setDRACOLoader(dracoLoader)
 
-// gltfLoader.load('/models/FlightHelmet/glTF/FlightHelmet.gltf',
-//     (gltf) => {
-//         const children = [...gltf.scene.children]
-//         for(const child of children)
-//         {
-//             scene.add(child)
-//         }
-//     },
-// )
+let pins = []
+var target = new THREE.Vector3(1,1,1);
 
-// gltfLoader.load('/models/Duck/glTF-Draco/Duck.gltf',
-//     (gltf) => {
-//         const children = [...gltf.scene.children]
-//         for(const child of children)
-//         {
-//             scene.add(child)
-//         }
-//     },
-// )
-
-
-gltfLoader.load('/models/rem.glb', (gltf) => {
-    gltf.scene.scale.set(0.025, 0.025, 0.025)
-    scene.add(gltf.scene)
-})
-
-
-const object1 = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 16, 16),
-    new THREE.MeshBasicMaterial({ color: '#ff0000' })
+gltfLoader.load('/models/rem.glb',
+    (gltf) => {
+        const children = [...gltf.scene.children]
+        for(const child of children)
+        {
+            child.scale.set(0.025, 0.025, 0.025)
+            if(child.name.includes('Pin')){
+                console.log(child.name)
+                pins.push(child)
+            }
+            scene.add(child)
+            scene.updateMatrixWorld(true);
+        }
+        console.log(pins)
+    },
 )
-object1.position.x = - 2
-object1.position.y = 2
-scene.add(object1)
 
 /**
  * Raycaster
@@ -145,12 +132,22 @@ controls.enableDamping = true
 
 window.addEventListener('click', () => {
     if(currentIntersect){
-        switch(currentIntersect.object){
-            case object1: 
-                    console.log('click on object 1')
-                    action.play()
-                break
-        }
+        console.log(currentIntersect.object)
+        console.log(currentIntersect.object.userData.name)
+
+        currentIntersect.object.geometry.computeBoundingBox()
+        var boundingBox = currentIntersect.object.geometry.boundingBox;
+
+        target.subVectors(boundingBox.max, boundingBox.min)
+        target.multiplyScalar(0.5)
+        target.add(boundingBox.min)
+        target.applyMatrix4(currentIntersect.object.matrixWorld)
+
+        console.log(target)
+
+        controls.target.set(target.x, 0.5, target.z)
+        camera.zoom = 9
+        camera.updateProjectionMatrix();
     }
 })
 
@@ -184,33 +181,36 @@ const tick = () =>
     previousTime = elapsedTime
 
     raycaster.setFromCamera(mouse, camera)
-    const objectsToTest = [object1]
-    const intersects = raycaster.intersectObjects(objectsToTest)
+    if(pins){
+        const objectsToTest = [pins]
 
-    if(intersects.length){
-        if(!currentIntersect){
-            console.log('mouse enter')
-        }
+        for(const o of objectsToTest){
+            const intersects = raycaster.intersectObjects(o)
 
-        currentIntersect = intersects[0]
-    } else {
-        if(currentIntersect){
-            console.log('mouse leave') 
-        }
-
-        currentIntersect = null
-    }
-
-    for(const intersect of intersects)
-    {
-        intersect.object.material.color.set('#0000ff')
-    } 
-
-    for(const object of objectsToTest)
-    {
-        if(!intersects.find(intersect => intersect.object === object))
-        {
-            object.material.color.set('#ff0000')
+            if(intersects.length){
+                if(!currentIntersect){
+                    //console.log('mouse enter')
+                }
+                currentIntersect = intersects[0]
+            } else {
+                if(currentIntersect){
+                    //console.log('mouse leave')
+                }
+                currentIntersect = null
+            }
+        
+            for(const intersect of intersects)
+            {
+                //console.log(intersect.object.userData.name)
+            } 
+        
+            for(const object of o)
+            {
+                if(!intersects.find(intersect => intersect.object === object))
+                {
+                    //object.material.color.set('#ff0000')
+                }
+            }
         }
     }
 
@@ -218,6 +218,7 @@ const tick = () =>
     controls.update()
 
     // Render
+
     renderer.render(scene, camera)
 
     // Call tick again on the next frame
