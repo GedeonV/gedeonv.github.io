@@ -16,4 +16,32 @@ body
     top: 0;
     left: 0;
     outline: none;
+    z-index: -1;
+}
+
+
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 1;
+    opacity: 1;
+    visibility: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s ease-out;
+}
+
+#loader h2 {
+    color: white;
+    font-size: 70px;
+}
+
+#loader.loaded {
+    opacity: 0;
+    visibility: hidden;
 }
