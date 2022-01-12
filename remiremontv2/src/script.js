@@ -68,6 +68,10 @@ function init(){
     // Default Scene
     scene = mainScene
 
+
+    const axesHelper = new THREE.AxesHelper( 5 );
+    scene.add( axesHelper );
+
     /**
      * Sizes
      */
@@ -99,6 +103,10 @@ function init(){
     // Base camera
     camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
     camera.position.set(2, 2, 2)
+    camera.rotation.order = 'YXZ';
+
+
+
     scene.add(camera)
 
     const helper = new THREE.CameraHelper(camera);
@@ -109,6 +117,7 @@ function init(){
      */
     const controls = new OrbitControls(camera, canvas)
     controls.enableDamping = true
+    controls.enablePan = false
 
     /**
      * Models 
@@ -147,7 +156,7 @@ function init(){
                 target.applyMatrix4(pins[0].matrixWorld)
 
                 console.log(target)
-                camera.position.set(target.x, 2, target.z)
+                camera.position.set(target.x - 2, 1, target.z - 2)
                 controls.target.set(target.x, 1, target.z)
 
                 controls.autoRotate = true;
