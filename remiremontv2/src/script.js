@@ -136,7 +136,7 @@ function init(){
     var target = new THREE.Vector3();
     var front_vector = new THREE.Vector3();
 
-    gltfLoader.load('../dist/models/rem.glb',
+    gltfLoader.load('/models/rem.glb',
         (gltf) => {
             const children = [...gltf.scene.children]
             for(const child of children)
