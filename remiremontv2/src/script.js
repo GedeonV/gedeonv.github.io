@@ -32,18 +32,25 @@ THREE.DefaultLoadingManager.onError = function ( url ) {
  * Base
  */
 
-var scene, camera
-
+var scene, camera, controls, focusCamera, focusControls
 var mainScene, focusScene
+
+var focusCameraActive = false
 
 init();
 
 document.querySelector('#scene1').addEventListener('click', () => {
     scene = mainScene
+    controls.autoRotate = true
+    focusCameraActive = false 
+    focusControls.enabled = false
 })
 
 document.querySelector('#scene2').addEventListener('click', () => {
     scene = focusScene
+    controls.autoRotate = false
+    focusCameraActive = true 
+    focusControls.enabled = true
 })
 
 function init(){
@@ -61,7 +68,7 @@ function init(){
 
     // Config Focus Scene
     focusScene = new THREE.Scene()
-    const texture = new THREE.TextureLoader().load('../dist/360/vue_1.jpg', tick);
+    const texture = new THREE.TextureLoader().load('/360/vue_1.jpg', tick);
     texture.mapping = THREE.EquirectangularReflectionMapping;
     focusScene.background = texture;
 
@@ -71,6 +78,7 @@ function init(){
 
     const axesHelper = new THREE.AxesHelper( 5 );
     scene.add( axesHelper );
+    focusScene.add( axesHelper );
 
     /**
      * Sizes
@@ -104,20 +112,29 @@ function init(){
     camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
     camera.position.set(2, 2, 2)
     camera.rotation.order = 'YXZ';
-
-
-
     scene.add(camera)
 
+    focusCamera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+    focusCamera.position.set(0, 0, 0)
+    focusScene.add(focusCamera)
+
     const helper = new THREE.CameraHelper(camera);
-    scene.add( helper );
+    const helper2 = new THREE.CameraHelper(focusCamera);
+    scene.add(helper);
+    focusScene.add(helper2)
 
     /**
      * Controls
      */
-    const controls = new OrbitControls(camera, canvas)
+    controls = new OrbitControls(camera, canvas)
     controls.enableDamping = true
     controls.enablePan = false
+
+    focusControls = new OrbitControls(focusCamera, canvas)
+    focusControls.enabled = false
+    focusControls.enableDamping = true
+    focusControls.target.set(0,0,-3)
+    
 
     /**
      * Models 
@@ -315,7 +332,11 @@ function init(){
 
         // Render
 
-        renderer.render(scene, camera)
+        if(focusCameraActive){
+            renderer.render(scene, focusCamera)
+        } else {
+            renderer.render(scene, camera)
+        }
 
         // Call tick again on the next frame
         window.requestAnimationFrame(tick)
