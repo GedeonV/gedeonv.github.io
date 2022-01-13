@@ -64,7 +64,7 @@ function init(){
 
     // Config Focus Scene
     focusScene = new THREE.Scene()
-    const texture = new THREE.TextureLoader().load('/360/vue_1.jpg', tick);
+    const texture = new THREE.TextureLoader().load('../../360/vue_1.jpg', tick);
     texture.mapping = THREE.EquirectangularReflectionMapping;
     focusScene.background = texture;
 
@@ -136,7 +136,7 @@ function init(){
     var target = new THREE.Vector3();
     var front_vector = new THREE.Vector3();
 
-    gltfLoader.load('/models/rem.glb',
+    gltfLoader.load('../../models/rem.glb',
         (gltf) => {
             const children = [...gltf.scene.children]
             for(const child of children)
