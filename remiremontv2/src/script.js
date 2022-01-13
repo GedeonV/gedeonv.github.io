@@ -9,9 +9,6 @@ import gsap from 'gsap'
 
 console.log('VERSION: ', THREE.REVISION );
 
-var url = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname
-console.log(url)
-
 const divLoader = document.querySelector('div#loader');
 
 THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
@@ -159,8 +156,13 @@ function init(){
                 target.applyMatrix4(pins[0].matrixWorld)
 
                 console.log(target)
-                camera.position.set(target.x - 2, 1, target.z - 2)
+                camera.position.set(target.x - 2, 5, target.z - 2)
                 controls.target.set(target.x, 1, target.z)
+                controls.maxPolarAngle = (Math.PI / 4)
+                controls.minPolarAngle = (Math.PI / 4)
+
+                controls.minDistance = 2
+                controls.maxDistance = 2
 
                 controls.autoRotate = true;
                 controls.autoRotateSpeed = 2.5
@@ -234,15 +236,14 @@ function init(){
                 }
             });
 
-            gsap.to(controls, {
-                duration: 1,
-                minDistance: 2,
-                ease: 'power1.inOut',
-                onComplete: () => {
-                    controls.maxDistance = 0
-                    controls.autoRotate = true; 
-                },
-            })    
+            // gsap.to(controls, {
+            //     duration: 1,
+            //     minDistance: 2,
+            //     ease: 'power1.inOut',
+            //     onComplete: () => {
+            //         controls.maxDistance = 0
+            //     },
+            // })    
         }
     })
 
