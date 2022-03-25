@@ -19,6 +19,11 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
 import rem from '../static/models/rem.glb'
 
+import vue1 from '../static/360/vue_1.jpg'
+import vue2 from '../static/360/vue_2.jpg'
+import vue3 from '../static/360/vue_3.jpg'
+import vue4 from '../static/360/vue_4.jpg'
+
 import { Object3D, Vector3 } from 'three'
 import gsap from 'gsap'
 
@@ -91,7 +96,7 @@ function init(){
     // Config Focus Scene
 
     focusScene = new THREE.Scene()
-    const texture = new THREE.TextureLoader().load('/360/vue_1.jpg');
+    const texture = new THREE.TextureLoader().load(vue1);
     texture.mapping = THREE.EquirectangularReflectionMapping;
     focusScene.background = texture;
 
@@ -454,10 +459,10 @@ function init(){
     composer.addPass( savePass );
     composer.addPass( outputPass );
 
-    lezardsScene = new Scene('/360/vue_1.jpg', renderer, canvas)
-    CBScene = new Scene('/360/vue_2.jpg', renderer, canvas)
-    TsubakiScene = new Scene('/360/vue_3.jpg', renderer, canvas)
-    DragonScene = new Scene('/360/vue_4.jpg', renderer, canvas)
+    lezardsScene = new Scene(vue1, renderer, canvas)
+    CBScene = new Scene(vue2, renderer, canvas)
+    TsubakiScene = new Scene(vue3, renderer, canvas)
+    DragonScene = new Scene(vue4, renderer, canvas)
 
     //transition = new Transition(lezardsScene, CBScene);
 
