@@ -1,10 +1,22 @@
 import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+
+import { Transition } from './js/Transition';
+import { Scene } from './js/Scene';
+
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { SavePass } from 'three/examples/jsm/postprocessing/SavePass.js';
+
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader.js';
+import { BlendShader } from 'three/examples/jsm/shaders/BlendShader.js';
+
 import * as dat from 'dat.gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import { Vector3 } from 'three'
+import { Object3D, Vector3 } from 'three'
 import gsap from 'gsap'
 
 console.log('VERSION: ', THREE.REVISION );
@@ -32,25 +44,32 @@ THREE.DefaultLoadingManager.onError = function ( url ) {
  * Base
  */
 
-var scene, camera, controls, focusCamera, focusControls
-var mainScene, focusScene
+var scene, camera, controls, focusCamera, focusScene, focusControls, composer, transition, renderer
+var mainScene, lezardsScene, CBScene, TsubakiScene, DragonScene
 
 var focusCameraActive = false
+var moving = false
+var activeCamera = 0
+var currentView
 
 init();
 
-document.querySelector('#scene1').addEventListener('click', () => {
+const backButton = document.querySelector('#backMainScene');
+backButton.addEventListener('click', (e) => {
     scene = mainScene
     controls.autoRotate = true
     focusCameraActive = false 
     focusControls.enabled = false
-})
 
-document.querySelector('#scene2').addEventListener('click', () => {
-    scene = focusScene
-    controls.autoRotate = false
-    focusCameraActive = true 
-    focusControls.enabled = true
+    gsap.to(camera, {
+        duration: 1,
+        zoom: 1,
+        onUpdate: function(){
+            camera.updateProjectionMatrix();
+        },
+    })
+    composer.passes[1].uniforms.mixRatio.value = 0.30;
+    e.currentTarget.classList.remove('visible');
 })
 
 function init(){
@@ -67,18 +86,28 @@ function init(){
     mainScene = new THREE.Scene()
 
     // Config Focus Scene
+
     focusScene = new THREE.Scene()
-    const texture = new THREE.TextureLoader().load('/360/vue_1.jpg', tick);
+    const texture = new THREE.TextureLoader().load('/360/vue_1.jpg');
     texture.mapping = THREE.EquirectangularReflectionMapping;
     focusScene.background = texture;
 
+    var white = new THREE.Color("rgb(255,255,255)")
+
+    
     // Default Scene
     scene = mainScene
-
 
     const axesHelper = new THREE.AxesHelper( 5 );
     scene.add( axesHelper );
     focusScene.add( axesHelper );
+
+
+    const size = 100;
+    const divisions = 100;
+
+    const gridHelper = new THREE.GridHelper( size, divisions, white, white);
+    focusScene.add( gridHelper )
 
     /**
      * Sizes
@@ -114,13 +143,16 @@ function init(){
     camera.rotation.order = 'YXZ';
     scene.add(camera)
 
+
+    // Focus Camera     
     focusCamera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-    focusCamera.position.set(0, 0, 0)
+    focusCamera.position.set(0, 3, 0)
     focusScene.add(focusCamera)
 
     const helper = new THREE.CameraHelper(camera);
-    const helper2 = new THREE.CameraHelper(focusCamera);
     scene.add(helper);
+
+    const helper2 = new THREE.CameraHelper(focusCamera);
     focusScene.add(helper2)
 
     /**
@@ -132,8 +164,9 @@ function init(){
 
     focusControls = new OrbitControls(focusCamera, canvas)
     focusControls.enabled = false
+    focusControls.enableZoom = false
     focusControls.enableDamping = true
-    focusControls.target.set(0,0,-3)
+    focusControls.target.set(0,3,0)
     
 
     /**
@@ -148,7 +181,6 @@ function init(){
 
     let pins = []
     var target = new THREE.Vector3();
-    var front_vector = new THREE.Vector3();
 
     gltfLoader.load('/models/rem.glb',
         (gltf) => {
@@ -164,6 +196,7 @@ function init(){
             }
             console.log(pins)
             if(pins.length > 0){
+                currentView = pins[0]
                 pins[0].geometry.computeBoundingBox()
                 var boundingBox = pins[0].geometry.boundingBox;
 
@@ -228,39 +261,141 @@ function init(){
     mainScene.add(directionalLight)
 
 
-    
+    /**
+     * Keybinds
+     */
+
+    var index = 0
+    const nextPin = () => {
+        index++
+        if(index > pins.length - 1){
+            index = 0
+        }
+        console.log(index)
+
+        console.log(pins[index])
+        console.log(pins[index].userData.name)
+
+        currentView = pins[index]
+
+        pins[index].geometry.computeBoundingBox()
+        var boundingBox = pins[index].geometry.boundingBox;
+
+        target.subVectors(boundingBox.max, boundingBox.min)
+        target.multiplyScalar(0.5)
+        target.add(boundingBox.min)
+        target.applyMatrix4(pins[index].matrixWorld)
+
+        gsap.to( controls.target, {
+            duration: 1,
+            x: target.x,
+            y: 1,
+            z: target.z,
+            onUpdate: function () {
+                controls.update();
+                moving = false   
+            },
+        });
+    }
+
+    const previousPin = () => {
+        index--
+        if(index < 0){
+            index = pins.length - 1
+        }
+        console.log(index)
+
+        console.log(pins[index])
+        console.log(pins[index].userData.name)
+
+        currentView = pins[index]
+
+        pins[index].geometry.computeBoundingBox()
+        var boundingBox = pins[index].geometry.boundingBox;
+
+        target.subVectors(boundingBox.max, boundingBox.min)
+        target.multiplyScalar(0.5)
+        target.add(boundingBox.min)
+        target.applyMatrix4(pins[index].matrixWorld)
+
+        gsap.to( controls.target, {
+            duration: 1,
+            x: target.x,
+            y: 1,
+            z: target.z,
+            onUpdate: function () {
+                controls.update();
+                moving = false   
+            },
+        });
+    }
+
+    window.addEventListener('keyup', event => {
+        if(event.code === "ArrowRight"){
+            nextPin()
+        }
+    })
+
+    window.addEventListener('keyup', event => {
+        if(event.code === "ArrowLeft"){
+            previousPin()
+        }
+    })
+
+    window.addEventListener('keyup', event => {
+        if(event.code === "KeyR"){
+            gsap.to(camera, {
+                duration: 1,
+                zoom: 1,
+                onUpdate: function(){
+                    camera.updateProjectionMatrix();
+                },
+            })
+            composer.passes[1].uniforms.mixRatio.value = 0;
+        }
+    }) 
+
+    window.addEventListener('keyup', event => {
+        if(event.code === "Digit1"){
+            activeCamera = 0
+        } else if(event.code === "Digit2"){
+            activeCamera = 1
+        } else if(event.code === "Digit3"){
+            activeCamera = 2
+        } else if(event.code === "Digit4"){
+            activeCamera = 3
+        }
+    })
 
     window.addEventListener('click', () => {
         if(currentIntersect){
             console.log(currentIntersect.object)
             console.log(currentIntersect.object.userData.name)
+            let testView = currentIntersect.object
+            let current = currentIntersect.object.userData.name
 
-            currentIntersect.object.geometry.computeBoundingBox()
-            var boundingBox = currentIntersect.object.geometry.boundingBox;
-
-            target.subVectors(boundingBox.max, boundingBox.min)
-            target.multiplyScalar(0.5)
-            target.add(boundingBox.min)
-            target.applyMatrix4(currentIntersect.object.matrixWorld)
-
-            gsap.to( controls.target, {
-                duration: 1,
-                x: target.x,
-                y: 1,
-                z: target.z,
-                onUpdate: function () {
-                    controls.update();
-                }
-            });
-
-            // gsap.to(controls, {
-            //     duration: 1,
-            //     minDistance: 2,
-            //     ease: 'power1.inOut',
-            //     onComplete: () => {
-            //         controls.maxDistance = 0
-            //     },
-            // })    
+            if(testView === currentView){
+                moving = true
+                gsap.to(camera, {
+                    duration: 1,
+                    zoom: 3,
+                    onStart: function(){
+                        composer.passes[1].uniforms.mixRatio.value = 0.70;
+                    },
+                    onUpdate: function(){
+                        camera.updateProjectionMatrix();
+                    },
+                    onComplete: function(){
+                        if(current === "Pin - Lezardscreation"){
+                            scene = focusScene
+                            controls.autoRotate = false
+                            focusCameraActive = true 
+                            focusControls.enabled = true
+                            backButton.classList.add('visible')
+                        }
+                    }
+                })
+            }
         }
     })
 
@@ -268,7 +403,7 @@ function init(){
     /**
      * Renderer
      */
-    const renderer = new THREE.WebGLRenderer({ 
+    renderer = new THREE.WebGLRenderer({ 
         canvas: canvas,
         antialias : true, 
         logarithmicDepthBuffer: true
@@ -277,6 +412,53 @@ function init(){
     renderer.shadowMap.type = THREE.PCFSoftShadowMap
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+    /**
+     * Post processing
+     */
+		
+    composer = new EffectComposer( renderer );
+    
+    // render pass
+    
+    var renderPass = new RenderPass( scene, camera )
+            
+    // save pass
+    
+    var renderTargetParameters = {
+        minFilter: THREE.LinearFilter,
+        magFilter: THREE.LinearFilter,
+        stencilBuffer: false
+    };
+    
+    var savePass = new SavePass( new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, renderTargetParameters ) );
+
+    // blend pass
+
+    var blendPass = new ShaderPass( BlendShader, 'tDiffuse1' );
+    blendPass.uniforms[ 'tDiffuse2' ].value = savePass.renderTarget.texture;
+    blendPass.uniforms[ 'mixRatio' ].value = 0.30;
+    
+    // output pass
+    
+    var outputPass = new ShaderPass( CopyShader );
+    outputPass.renderToScreen = true;
+    
+    // setup pass chain
+    
+    composer.addPass( renderPass );
+    composer.addPass( blendPass );
+    composer.addPass( savePass );
+    composer.addPass( outputPass );
+
+    lezardsScene = new Scene('/360/vue_1.jpg', renderer, canvas)
+    CBScene = new Scene('/360/vue_2.jpg', renderer, canvas)
+    TsubakiScene = new Scene('/360/vue_3.jpg', renderer, canvas)
+    DragonScene = new Scene('/360/vue_4.jpg', renderer, canvas)
+
+    //transition = new Transition(lezardsScene, CBScene);
+
+    //console.log(renderer)
 
     /**
      * Animate
@@ -332,16 +514,24 @@ function init(){
 
         // Render
 
+    
         if(focusCameraActive){
             renderer.render(scene, focusCamera)
         } else {
-            renderer.render(scene, camera)
+            composer.render();
+            if(activeCamera === 0){
+                renderer.render(scene, camera)
+            } else if(activeCamera === 1){
+                CBScene.render()
+            } else if(activeCamera === 2){
+                lezardsScene.render()
+            } else if(activeCamera === 3){
+                TsubakiScene.render()
+            }
         }
 
         // Call tick again on the next frame
         window.requestAnimationFrame(tick)
     }
+    tick()
 }
-
-
-
