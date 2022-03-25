@@ -82,6 +82,20 @@ module.exports = {
                         }
                     }
                 ]
+            },
+
+            {
+                test: /\.(glb|obj)$/,
+                use:
+                [
+                    {
+                        loader: 'file-loader',
+                        options:
+                        {
+                            outputPath: 'assets/models/'
+                        }
+                    }
+                ]
             }
         ]
     }

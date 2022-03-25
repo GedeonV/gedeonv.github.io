@@ -16,6 +16,9 @@ import { BlendShader } from 'three/examples/jsm/shaders/BlendShader.js';
 import * as dat from 'dat.gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+
+import rem from '../static/models/rem.glb'
+
 import { Object3D, Vector3 } from 'three'
 import gsap from 'gsap'
 
@@ -182,7 +185,7 @@ function init(){
     let pins = []
     var target = new THREE.Vector3();
 
-    gltfLoader.load('/models/rem.glb',
+    gltfLoader.load(rem,
         (gltf) => {
             const children = [...gltf.scene.children]
             for(const child of children)
