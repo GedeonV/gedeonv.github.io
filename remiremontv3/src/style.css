@@ -1,0 +1,88 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body
+{
+    overflow: hidden;
+}
+
+.webgl
+{
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+    z-index: -1;
+}
+
+
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+    z-index: 1;
+    opacity: 1;
+    visibility: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s ease-out;
+}
+
+#loader h2 {
+    color: white;
+    font-size: 70px;
+}
+
+#loader.loaded {
+    opacity: 0;
+    visibility: hidden;
+}
+
+#backMainScene {
+    visibility: hidden;
+    font-size: 14px;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: white;
+    background-color: rgba(165, 37, 37, 0.85);
+    border-radius: 50px;
+    padding: 10px 35px;
+    outline: none;
+    border: 0;
+
+    position: absolute;
+    top: 15px;
+    right: 15px;
+
+    transition: 0.5s ease-out;
+    transform: translateY(-100%);
+}
+
+#backMainScene.visible {
+    visibility: visible;
+    transform: translateY(0);
+}
+
+span.label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: white;
+    background-color: red;
+    padding: 15px 35px;
+    border-radius: 0px;
+    visibility: hidden;
+    will-change: transform;
+}
+
+span.label.visible {
+    visibility: visible;
+}
