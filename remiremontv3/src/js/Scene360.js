@@ -42,8 +42,8 @@ export class Scene360 {
         this.scene.add(this.camera)
 
 
-        this.axeHelper = new THREE.AxesHelper(5);
-        this.scene.add(this.axeHelper)
+        //this.axeHelper = new THREE.AxesHelper(5);
+        //this.scene.add(this.axeHelper)
 
         /**
          * Setup Raycaster
@@ -100,9 +100,9 @@ export class Scene360 {
 
             this.raycasterLabel.setFromCamera(this.tempV, this.camera)
             const intersectedObjects = this.raycasterLabel.intersectObjects(this.scene.children)
+
             const show = intersectedObjects.length && this.hotspots[i] === intersectedObjects[0].object;
-            console.log(show)
-            if(!show){
+            if(!show || Math.abs(this.tempV.z) > 1){
                 this.labels[i].style.display = 'none'
             } else {
                 this.labels[i].style.display = ''
@@ -111,7 +111,10 @@ export class Scene360 {
                 const y = (this.tempV.y * -.5 + .5) * this.canvas.clientHeight;
             
                 this.labels[i].style.transform = `translate3d(30px, -50%, 0) translate3d(${x}px, ${y}px, 0)`
-            }
+                this.labels[i].style.zIndex = (-this.tempV.z * .5 + .5) * 100000 | 0;
+            }   
+
+            
         }
         
         this.renderer.render(this.scene, this.camera);
@@ -132,8 +135,6 @@ export class Scene360 {
         this.boundEventMove = this.onMouseMove.bind(this)
         window.addEventListener('mousemove', this.boundEventMove, false)
     }
-
-    
 
     onMouseMove(e){
         this.mouse.x = e.clientX / this.sizes.width * 2 - 1
