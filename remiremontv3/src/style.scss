@@ -34,16 +34,16 @@ body
     align-items: center;
     justify-content: center;
     transition: 0.3s ease-out;
-}
 
-#loader h2 {
-    color: white;
-    font-size: 70px;
-}
+    &.loaded {
+        opacity: 0;
+        visibility: hidden;
+    }
 
-#loader.loaded {
-    opacity: 0;
-    visibility: hidden;
+    h2 {
+        color: white;
+        font-size: 70px;
+    }
 }
 
 #backMainScene {
@@ -64,26 +64,55 @@ body
 
     transition: 0.5s ease-out;
     transform: translateY(-100%);
+
+    &.visible {
+        visibility: visible;
+        transform: translateY(0);
+    }
 }
 
-#backMainScene.visible {
-    visibility: visible;
-    transform: translateY(0);
-}
-
-span.label {
+div.hotspot {
     position: absolute;
     left: 0;
     top: 0;
     color: white;
     font-weight: bold;
     background-color: rgba(165, 37, 37);
-    padding: 10px 35px;
-    border-radius: 0px;
+    //padding: 10px 35px;
     visibility: hidden;
     will-change: transform;
-}
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    
+    transition: background-color 0.5s ease-out, color 0.5s ease-out;
+    cursor: pointer;
+    
+    &:hover {
+        background-color: white;
 
-span.label.visible {
-    visibility: visible;
+        span.label {
+            color: rgba(165, 37, 37);
+            background-color: white;
+        }
+    }
+
+    span.label {
+        position: absolute;
+        top: 50%;
+        left: 100%;
+        transform: translate(30px, -50%);
+        width: 150px;
+        height: 48px;
+        border: 0;
+        background-color: rgba(165, 37, 37);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.5s ease-out, color 0.5s ease-out;
+    }
+
+    &.visible {
+        visibility: visible;
+    }
 }

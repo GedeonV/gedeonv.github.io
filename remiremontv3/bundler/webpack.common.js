@@ -9,7 +9,6 @@ module.exports = {
     {
         filename: 'bundle.[contenthash].js',
         path: path.resolve(__dirname, '../dist'),
-        publicPath: '/'
     },
     devtool: 'source-map',
     plugins:
@@ -52,6 +51,19 @@ module.exports = {
                 [
                     MiniCSSExtractPlugin.loader,
                     'css-loader'
+                ]
+            },
+
+            //SASS
+            {
+                test: /\.s[ac]ss$/i,
+                use: [
+                    // Creates `style` nodes from JS strings
+                    "style-loader",
+                    // Translates CSS into CommonJS
+                    "css-loader",
+                    // Compiles Sass to CSS
+                    "sass-loader",
                 ]
             },
 

@@ -29,7 +29,7 @@ import gsap from 'gsap'
 import { Scene360 } from './Scene360';
 
 const stats = new Stats()
-stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
+stats.showPanel(0)
 document.body.appendChild(stats.dom)
 
 console.log('VERSION: ', THREE.REVISION );
@@ -52,19 +52,22 @@ THREE.DefaultLoadingManager.onError = function ( url ) {
     console.log( 'There was an error loading ' + url );
 };
 
-export class World {r
+export class World {
     constructor(canvas){
-        var scene, camera, controls, composer, transition, renderer, gui
-        var mainScene, lezardsScene, CBScene, TsubakiScene, DragonScene
+        var scene, scenes, camera, controls, composer, transition, renderer, gui
+        var mainScene, LezardsScene, CBScene, TsubakiScene, DragonScene
 
         var activeCamera = 0
         var currentView
 
         const backButton = document.querySelector('#backMainScene');
         backButton.addEventListener('click', (e) => {
-            scene = mainScene
+            activeCamera = 0
             controls.autoRotate = true
-
+            controls.enabled = true
+            scenes.forEach(c => {
+                c.disableScene()
+            })
             gsap.to(camera, {
                 duration: 1,
                 zoom: 1,
@@ -79,32 +82,22 @@ export class World {r
         /**
          * Scenes
          */
-    
-        // Config Main Scene
         mainScene = new THREE.Scene()
         mainScene.background = new Color('#FFFFFF')
         mainScene.fog = new THREE.Fog(0xFFFFFF, 1, 100)
-
-        var white = new THREE.Color("rgb(255,255,255)")
         
-        // Default Scene
         scene = mainScene
         
         const axesHelper = new THREE.AxesHelper( 5 );
         scene.add( axesHelper );
     
-        const size = 100;
-        const divisions = 100;
-    
         /**
          * Sizes
          */
-    
         const sizes = {
             width: window.innerWidth,
             height: window.innerHeight
         }
-    
 
         this.onWindowResize = function(){
             // Update sizes
@@ -123,8 +116,6 @@ export class World {r
         /**
          * Camera
          */
-    
-        // Base camera
         camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
         camera.position.set(2, 2, 2)
         camera.rotation.order = 'YXZ';
@@ -132,6 +123,7 @@ export class World {r
     
         const helper = new THREE.CameraHelper(camera);
         scene.add(helper);
+
         /**
          * Controls
          */
@@ -142,7 +134,6 @@ export class World {r
         /**
          * Models 
          */
-    
         const gltfLoader = new GLTFLoader()
         const dracoLoader = new DRACOLoader()
     
@@ -199,13 +190,11 @@ export class World {r
         /**
          * Raycaster
          */
-    
         const raycaster = new THREE.Raycaster()
     
         /**
          * Mouse
          */
-    
         const mouse = new THREE.Vector2()
     
         window.addEventListener('mousemove', (event) => {
@@ -221,22 +210,12 @@ export class World {r
     
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
         directionalLight.castShadow = true
-        //directionalLight.shadowCameraVisible = true
-
-        // directionalLight.shadow.mapSize.set(1024, 1024)
-        // directionalLight.shadow.camera.far = 15
-        // directionalLight.shadow.camera.left = - 7
-        // directionalLight.shadow.camera.top = 7
-        // directionalLight.shadow.camera.right = 7
-        // directionalLight.shadow.camera.bottom = - 7
         directionalLight.position.set(0, 5, 0)
         mainScene.add(directionalLight)
-    
     
         /**
          * Keybinds
          */
-    
         var index = 0
 
         this.previousPin = () => {
@@ -314,29 +293,41 @@ export class World {r
             if(e.code === "Digit1"){
                 activeCamera = 0
                 controls.enabled = true
-                lezardsScene.disableScene()
-                TsubakiScene.disableScene()
-                CBScene.disableScene()
+
+                scenes.forEach(c => {
+                    c.disableScene()
+                })
             } else if(e.code === "Digit2"){
                 // CB Scene
-                activeCamera = 1                
+                activeCamera = 1     
+                controls.enabled = false
+                scenes.forEach(c => {
+                    c.disableScene()
+                })           
                 CBScene.enableScene()
-                lezardsScene.disableScene()
-                TsubakiScene.disableScene()
             } else if(e.code === "Digit3"){
                 // Lezards Scene
                 activeCamera = 2
                 controls.enabled = false
-                lezardsScene.enableScene()
-                CBScene.disableScene()
-                TsubakiScene.disableScene()
+                scenes.forEach(c => {
+                    c.disableScene()
+                })
+                LezardsScene.enableScene()
             } else if(e.code === "Digit4"){
                 // Tsubaki Scene
                 activeCamera = 3
                 controls.enabled = false
+                scenes.forEach(c => {
+                    c.disableScene()
+                })
                 TsubakiScene.enableScene()
-                CBScene.disableScene()
-                lezardsScene.disableScene()
+            } else if(e.code === "Digit5"){
+                activeCamera = 4
+                controls.enabled = false
+                scenes.forEach(c => {
+                    c.disableScene()
+                })
+                DragonScene.enableScene()
             }
         }
     
@@ -358,7 +349,43 @@ export class World {r
                         onComplete: function(){
                             if(current === "Pin - Lezardscreation"){
                                 activeCamera = 2
+                                controls.enabled = false
                                 controls.autoRotate = false
+
+                                scenes.forEach(c => {
+                                    c.disableScene()
+                                })
+                                LezardsScene.enableScene()                               
+                                backButton.classList.add('visible')
+                            } else if(current === "Pin - Cote et braise") {
+                                activeCamera = 1
+                                controls.enabled = false
+                                controls.autoRotate = false
+
+                                scenes.forEach(c => {
+                                    c.disableScene()
+                                })
+                                CBScene.enableScene()                               
+                                backButton.classList.add('visible')
+                            } else if(current === "Pin - Tsubaki"){
+                                activeCamera = 3
+                                controls.enabled = false
+                                controls.autoRotate = false
+
+                                scenes.forEach(c => {
+                                    c.disableScene()
+                                })
+                                TsubakiScene.enableScene()                               
+                                backButton.classList.add('visible')
+                            } else if(current === "Pin - Dragon or"){
+                                activeCamera = 4
+                                controls.enabled = false
+                                controls.autoRotate = false
+
+                                scenes.forEach(c => {
+                                    c.disableScene()
+                                })
+                                DragonScene.enableScene()                               
                                 backButton.classList.add('visible')
                             }
                         }
@@ -383,15 +410,12 @@ export class World {r
         /**
          * Post processing
          */
-            
         composer = new EffectComposer( renderer );
         
         // render pass
-        
         var renderPass = new RenderPass( scene, camera )
                 
         // save pass
-        
         var renderTargetParameters = {
             minFilter: THREE.LinearFilter,
             magFilter: THREE.LinearFilter,
@@ -407,12 +431,10 @@ export class World {r
         blendPass.uniforms[ 'mixRatio' ].value = 0.30;
         
         // output pass
-        
         var outputPass = new ShaderPass( CopyShader );
         outputPass.renderToScreen = true;
         
         // setup pass chain
-        
         composer.addPass( renderPass );
         composer.addPass( blendPass );
         composer.addPass( savePass );
@@ -422,32 +444,31 @@ export class World {r
         /**
          * Scene 360
          */
-    
-        lezardsScene = new Scene360(vue1, renderer, canvas)
-        lezardsScene.createHotspot([
-            {
-                HotspotName: "Radio",
-                position: new THREE.Vector3(-50,10,5),
-            },
-            {
-                HotspotName: "Amphi",
-                position: new THREE.Vector3(10,10,-50),
-            },
-            {
-                HotspotName: "Eul Camion",
-                position: new THREE.Vector3(10,10,50)
-            },
-        ]            
-        )
+        scenes = [
+            LezardsScene = new Scene360("Lezardscreation", vue1, renderer, canvas),
+            CBScene = new Scene360("Côtes et Braises",vue2, renderer, canvas),
+            TsubakiScene = new Scene360("Tsubaki", vue3, renderer, canvas),
+            DragonScene = new Scene360("Dragon d'or", vue4, renderer, canvas)
+        ]
 
-        CBScene = new Scene360(vue2, renderer, canvas)
-        TsubakiScene = new Scene360(vue3, renderer, canvas)
-        DragonScene = new Scene360(vue4, renderer, canvas)
+        LezardsScene.createHotspot([
+            { HotspotName: "Amphi", position: new THREE.Vector3(-50,10,5)},
+            { HotspotName: "Restaurant", position: new THREE.Vector3(10,10,-50)},
+            { HotspotName: "Toilettes", position: new THREE.Vector3(10,10,50)}
+        ])
+
+        CBScene.createHotspot([
+            { HotspotName: "Toilettes", position: new THREE.Vector3(-50,10,11)},
+        ])
+
+        TsubakiScene.createHotspot([
+            { HotspotName: "Toilettes", position: new THREE.Vector3(100,-10,50)},
+            { HotspotName: "Dortoir", position: new THREE.Vector3(14,30,100)}
+        ])
     
         /**
          * Animate
          */
-    
         let currentIntersect = null
     
         const clock = new THREE.Clock()
@@ -488,11 +509,12 @@ export class World {r
             } else if(activeCamera === 1){
                 CBScene.render()
             } else if(activeCamera === 2){
-                lezardsScene.render(elapsedTime)
+                LezardsScene.render()
             } else if(activeCamera === 3){
                 TsubakiScene.render()
+            } else if(activeCamera === 4){
+                DragonScene.render()
             }
-
             stats.end()
         }
     }

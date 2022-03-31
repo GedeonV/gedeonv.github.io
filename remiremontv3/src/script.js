@@ -1,5 +1,5 @@
-import { World } from "./js/World";
-import "./style.css"
+import { World } from './js/World'
+import "./style.scss"
 
 const canvas = document.querySelector('canvas.webgl')
 const world = new World(canvas)
