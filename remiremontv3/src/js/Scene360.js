@@ -41,6 +41,7 @@ export class Scene360 {
          */
         this.camera = new THREE.PerspectiveCamera(75, this.sizes.width / this.sizes.height, 0.1, 10000);
         this.camera.position.set(0,5,0)
+        this.camera.lookAt(0,5,5)
         this.camera.updateProjectionMatrix();
         this.scene.add(this.camera)
 
