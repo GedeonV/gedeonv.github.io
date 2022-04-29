@@ -168,61 +168,60 @@ export class Scene360 {
     }
 
     show(){
-            const time = this.clock.getElapsedTime()
-            if(this.hotspots){
-                for(let i=0; i<this.hotspots.length;i++){
-                    this.hotspots[i].position.y += Math.cos( time ) * 0.01;
-    
-                    this.hotspots[i].updateWorldMatrix(true, false);
-                    this.hotspots[i].getWorldPosition(this.tempV);
-    
-                    this.tempV.project(this.camera)
-    
-                    this.raycasterLabel.setFromCamera(this.tempV, this.camera)
-                    const intersectedObjects = this.raycasterLabel.intersectObjects(this.scene.children)
-    
-                    const show = intersectedObjects.length && this.hotspots[i] === intersectedObjects[0].object;
-                    if(!show || Math.abs(this.tempV.z) > 1){
-                        this.labels[i].style.display = 'none'
-                    } else {
-                        this.labels[i].style.display = ''
-    
-                        const x = (this.tempV.x *  .5 + .5) * this.canvas.clientWidth;
-                        const y = (this.tempV.y * -.5 + .5) * this.canvas.clientHeight;
-                    
-                        this.labels[i].style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0)`
-                        this.labels[i].style.zIndex = (-this.tempV.z * .5 + .5) * 100000 | 0;
-                    }
-                }
-            }
-            
-            if(this.points){
-                for(let i=0; i<this.points.length; i++){
-                    this.points[i].updateWorldMatrix(true, false);
-                    this.points[i].getWorldPosition(this.tempV);
-    
-                    this.tempV.project(this.camera)
-    
-                    this.raycasterLabel.setFromCamera(this.tempV, this.camera)
-                    const intersectedObjects = this.raycasterLabel.intersectObjects(this.scene.children)
-    
-                    const show = intersectedObjects.length && this.points[i] === intersectedObjects[0].object;
-                    if(!show || Math.abs(this.tempV.z) > 1){
-                        this.divs[i].style.display = 'none'
-                    } else {
-                        this.divs[i].style.display = ''
-    
-                        const x = (this.tempV.x *  .5 + .5) * this.canvas.clientWidth;
-                        const y = (this.tempV.y * -.5 + .5) * this.canvas.clientHeight;
-                    
-                        this.divs[i].style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0)`
-                        this.divs[i].style.zIndex = (-this.tempV.z * .5 + .5) * 100000 | 0;
-                    }
-                }
-            }
+        const time = this.clock.getElapsedTime()
+        if(this.hotspots){
+            for(let i=0; i<this.hotspots.length;i++){
+                this.hotspots[i].position.y += Math.cos( time ) * 0.01;
 
-            this.renderer.render(this.scene, this.camera);   
-            
+                this.hotspots[i].updateWorldMatrix(true, false);
+                this.hotspots[i].getWorldPosition(this.tempV);
+
+                this.tempV.project(this.camera)
+
+                this.raycasterLabel.setFromCamera(this.tempV, this.camera)
+                const intersectedObjects = this.raycasterLabel.intersectObjects(this.scene.children)
+
+                const show = intersectedObjects.length && this.hotspots[i] === intersectedObjects[0].object;
+                if(!show || Math.abs(this.tempV.z) > 1){
+                    this.labels[i].style.display = 'none'
+                } else {
+                    this.labels[i].style.display = ''
+
+                    const x = (this.tempV.x *  .5 + .5) * this.canvas.clientWidth;
+                    const y = (this.tempV.y * -.5 + .5) * this.canvas.clientHeight;
+                
+                    this.labels[i].style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0)`
+                    this.labels[i].style.zIndex = (-this.tempV.z * .5 + .5) * 100000 | 0;
+                }
+            }
+        }
+        
+        if(this.points){
+            for(let i=0; i<this.points.length; i++){
+                this.points[i].updateWorldMatrix(true, false);
+                this.points[i].getWorldPosition(this.tempV);
+
+                this.tempV.project(this.camera)
+
+                this.raycasterLabel.setFromCamera(this.tempV, this.camera)
+                const intersectedObjects = this.raycasterLabel.intersectObjects(this.scene.children)
+
+                const show = intersectedObjects.length && this.points[i] === intersectedObjects[0].object;
+                if(!show || Math.abs(this.tempV.z) > 1){
+                    this.divs[i].style.display = 'none'
+                } else {
+                    this.divs[i].style.display = ''
+
+                    const x = (this.tempV.x *  .5 + .5) * this.canvas.clientWidth;
+                    const y = (this.tempV.y * -.5 + .5) * this.canvas.clientHeight;
+                
+                    this.divs[i].style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0)`
+                    this.divs[i].style.zIndex = (-this.tempV.z * .5 + .5) * 100000 | 0;
+                }
+            }
+        }
+
+        this.renderer.render(this.scene, this.camera);   
     }
 
     enableScene(){
