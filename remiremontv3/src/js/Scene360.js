@@ -8,8 +8,14 @@ export class Scene360 {
         this.renderer = renderer
         this.canvas = canvas
         this.currentIntersect = null
+        
+        this.child = null
+
         this.hotspots = []
+        this.points = []
+        
         this.labels = []
+        this.divs = []
 
         this.clock = new THREE.Clock()
         this.tempV = new THREE.Vector3();
@@ -19,6 +25,9 @@ export class Scene360 {
          */
         this.gui = new dat.GUI({name: 'Scène 360'});
         this.gui.hide()
+
+        this.gui2 = new dat.GUI({name: 'Points Info'});
+        this.gui2.hide()
 
         this.sizes = {
             width: window.innerWidth,
@@ -69,8 +78,27 @@ export class Scene360 {
         this.camera = this.camera
     }
 
+    slugify(text){
+        this.slug = text
+        this.slug = this.slug.replace(/^\s+|\s+$/g, '');
+        this.slug = this.slug.toLowerCase();
+        var from = "ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆÍÌÎÏŇÑÓÖÒÔÕØŘŔŠŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇíìîïňñóöòôõøðřŕšťúůüùûýÿžþÞĐđßÆa·/_,:;";
+        var to   = "AAAAAACCCDEEEEEEEEIIIINNOOOOOORRSTUUUUUYYZaaaaaacccdeeeeeeeeiiiinnooooooorrstuuuuuyyzbBDdBAa------";
+        for (var i=0, l=from.length ; i<l ; i++) {
+            this.slug = this.slug.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+        }
+        this.slug = this.slug.replace(/[^a-z0-9 -]/g, '') 
+        .replace(/\s+/g, '-') 
+        .replace(/-+/g, '-'); 
+
+        return this.slug
+    }
+
     createHotspot(hotspots){
         hotspots.forEach((element, key) => {
+
+            console.log(element)
+
             this.geometry = new THREE.SphereGeometry(1,32,16)
             this.material = new THREE.MeshBasicMaterial({color: '#a52424', transparent: true, opacity: 0}) // transparent: true, opacity: 0
             const hotspot = new THREE.Mesh(this.geometry, this.material)
@@ -89,74 +117,130 @@ export class Scene360 {
             this.label.textContent = element.HotspotName
 
             this.elem.appendChild(this.label)
-
-            this.slug = element.HotspotName
-            this.slug = this.slug.replace(/^\s+|\s+$/g, '');
-            this.slug = this.slug.toLowerCase();
-            var from = "ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆÍÌÎÏŇÑÓÖÒÔÕØŘŔŠŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇíìîïňñóöòôõøðřŕšťúůüùûýÿžþÞĐđßÆa·/_,:;";
-            var to   = "AAAAAACCCDEEEEEEEEIIIINNOOOOOORRSTUUUUUYYZaaaaaacccdeeeeeeeeiiiinnooooooorrstuuuuuyyzbBDdBAa------";
-            for (var i=0, l=from.length ; i<l ; i++) {
-                this.slug = this.slug.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-            }
-            this.slug = this.slug.replace(/[^a-z0-9 -]/g, '') 
-            .replace(/\s+/g, '-') 
-            .replace(/-+/g, '-'); 
-
+            this.slug = this.slugify(element.HotspotName)
             this.elem.classList.add('hotspot', `hotspot__${this.slug}`)
             this.label.classList.add('label')
             this.labels.push(this.elem)
             document.querySelector('body').appendChild(this.elem)
             
             this.elem.addEventListener('click', () => {
-                console.log('click')
+                if(element.link){
+                    console.log(element.link)
+                    this.child = element.link
+                }
             })
-
             this.scene.add(hotspot)
         });
+        return this
     }
 
-    render(){   
-        const time = this.clock.getElapsedTime()
-        for(let i=0; i<this.hotspots.length;i++){
-            this.hotspots[i].position.y += Math.cos( time ) * 0.01;
+    createInfo(info){
+        info.forEach((i, key) => {
+            this.geometry = new THREE.SphereGeometry(1,32,16)
+            this.material = new THREE.MeshBasicMaterial({color: '#a52424', transparent: true, opacity: 0}) // transparent: true, opacity: 0
+            const infoP = new THREE.Mesh(this.geometry, this.material)
+            infoP.position.copy(i.position)
+            this.points.push(infoP)
 
-            this.hotspots[i].updateWorldMatrix(true, false);
-            this.hotspots[i].getWorldPosition(this.tempV);
+            this.folder2 = this.gui2.addFolder(i.InfoName)
+            this.folder2.add(infoP.position, 'x', -100, 100, 0.01).name('X')
+            this.folder2.add(infoP.position, 'y', -100, 100, 0.01).name('Y')
+            this.folder2.add(infoP.position, 'z', -100, 100, 0.01).name('Z')
 
-            this.tempV.project(this.camera)
+            this.elem = document.createElement("div");
 
-            this.raycasterLabel.setFromCamera(this.tempV, this.camera)
-            const intersectedObjects = this.raycasterLabel.intersectObjects(this.scene.children)
+            this.slug = this.slugify(i.InfoName)
+            this.elem.classList.add('info', `info__${this.slug}`)
+            this.divs.push(this.elem)
 
-            const show = intersectedObjects.length && this.hotspots[i] === intersectedObjects[0].object;
-            if(!show || Math.abs(this.tempV.z) > 1){
-                this.labels[i].style.display = 'none'
-            } else {
-                this.labels[i].style.display = ''
+            document.querySelector('body').appendChild(this.elem)
+            this.elem.addEventListener('click', () => {
+                const popup = document.querySelector(i.element)
+                popup.classList.add('visible')
+                popup.querySelector('.closeButton').addEventListener('click', () => {
+                    popup.classList.remove('visible')
+                })
+            })
 
-                const x = (this.tempV.x *  .5 + .5) * this.canvas.clientWidth;
-                const y = (this.tempV.y * -.5 + .5) * this.canvas.clientHeight;
-            
-                this.labels[i].style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0)`
-                this.labels[i].style.zIndex = (-this.tempV.z * .5 + .5) * 100000 | 0;
+            this.scene.add(infoP)
+        })
+        return this
+    }
+
+    show(){
+            const time = this.clock.getElapsedTime()
+            if(this.hotspots){
+                for(let i=0; i<this.hotspots.length;i++){
+                    this.hotspots[i].position.y += Math.cos( time ) * 0.01;
+    
+                    this.hotspots[i].updateWorldMatrix(true, false);
+                    this.hotspots[i].getWorldPosition(this.tempV);
+    
+                    this.tempV.project(this.camera)
+    
+                    this.raycasterLabel.setFromCamera(this.tempV, this.camera)
+                    const intersectedObjects = this.raycasterLabel.intersectObjects(this.scene.children)
+    
+                    const show = intersectedObjects.length && this.hotspots[i] === intersectedObjects[0].object;
+                    if(!show || Math.abs(this.tempV.z) > 1){
+                        this.labels[i].style.display = 'none'
+                    } else {
+                        this.labels[i].style.display = ''
+    
+                        const x = (this.tempV.x *  .5 + .5) * this.canvas.clientWidth;
+                        const y = (this.tempV.y * -.5 + .5) * this.canvas.clientHeight;
+                    
+                        this.labels[i].style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0)`
+                        this.labels[i].style.zIndex = (-this.tempV.z * .5 + .5) * 100000 | 0;
+                    }
+                }
             }
-        }
-        this.renderer.render(this.scene, this.camera);   
+            
+            if(this.points){
+                for(let i=0; i<this.points.length; i++){
+                    this.points[i].updateWorldMatrix(true, false);
+                    this.points[i].getWorldPosition(this.tempV);
+    
+                    this.tempV.project(this.camera)
+    
+                    this.raycasterLabel.setFromCamera(this.tempV, this.camera)
+                    const intersectedObjects = this.raycasterLabel.intersectObjects(this.scene.children)
+    
+                    const show = intersectedObjects.length && this.points[i] === intersectedObjects[0].object;
+                    if(!show || Math.abs(this.tempV.z) > 1){
+                        this.divs[i].style.display = 'none'
+                    } else {
+                        this.divs[i].style.display = ''
+    
+                        const x = (this.tempV.x *  .5 + .5) * this.canvas.clientWidth;
+                        const y = (this.tempV.y * -.5 + .5) * this.canvas.clientHeight;
+                    
+                        this.divs[i].style.transform = `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0)`
+                        this.divs[i].style.zIndex = (-this.tempV.z * .5 + .5) * 100000 | 0;
+                    }
+                }
+            }
+
+            this.renderer.render(this.scene, this.camera);   
+            
     }
 
     enableScene(){
         this.controls.enabled = true;
-        this.gui.show()
+        this.gui.show();
+        this.gui2.show();
+
+        if(this.child){
+            this.child = null
+        }
 
         this.labels.forEach(el => {
             el.classList.add('visible')
         })
 
-        // this.boundEventClick = this.onClick.bind(this)
-        // window.addEventListener('click', this.boundEventClick, false)
-
-        // this.boundEventMove = this.onMouseMove.bind(this)
-        // window.addEventListener('mousemove', this.boundEventMove, false)
+        this.divs.forEach(el => {
+            el.classList.add('visible')
+        })
     }
 
     // onMouseMove(e){
@@ -188,8 +272,13 @@ export class Scene360 {
     disableScene(){
         this.controls.enabled = false
         this.gui.hide()
+        this.gui2.hide()
 
         this.labels.forEach(el => {
+            el.classList.remove('visible')
+        })
+
+        this.divs.forEach(el => {
             el.classList.remove('visible')
         })
 

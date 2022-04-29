@@ -55,7 +55,7 @@ THREE.DefaultLoadingManager.onError = function ( url ) {
 export class World {
     constructor(canvas){
         var scene, scenes, camera, controls, composer, transition, renderer, gui
-        var mainScene, LezardsScene, CBScene, TsubakiScene, DragonScene
+        var mainScene, LezardsScene, CBScene, TsubakiScene, DragonScene, Rest, current360
 
         var activeCamera = 0
         var currentView
@@ -304,6 +304,7 @@ export class World {
                 scenes.forEach(c => {
                     c.disableScene()
                 })           
+                current360 = CBScene
                 CBScene.enableScene()
             } else if(e.code === "Digit3"){
                 // Lezards Scene
@@ -312,6 +313,7 @@ export class World {
                 scenes.forEach(c => {
                     c.disableScene()
                 })
+                current360 = LezardsScene
                 LezardsScene.enableScene()
             } else if(e.code === "Digit4"){
                 // Tsubaki Scene
@@ -320,6 +322,7 @@ export class World {
                 scenes.forEach(c => {
                     c.disableScene()
                 })
+                current360 = TsubakiScene
                 TsubakiScene.enableScene()
             } else if(e.code === "Digit5"){
                 activeCamera = 4
@@ -327,6 +330,7 @@ export class World {
                 scenes.forEach(c => {
                     c.disableScene()
                 })
+                current360 = DragonScene
                 DragonScene.enableScene()
             }
         }
@@ -355,6 +359,7 @@ export class World {
                                 scenes.forEach(c => {
                                     c.disableScene()
                                 })
+                                current360 = LezardsScene
                                 LezardsScene.enableScene()                               
                                 backButton.classList.add('visible')
                             } else if(current === "Pin - Cote et braise") {
@@ -365,6 +370,7 @@ export class World {
                                 scenes.forEach(c => {
                                     c.disableScene()
                                 })
+                                current360 = CBScene
                                 CBScene.enableScene()                               
                                 backButton.classList.add('visible')
                             } else if(current === "Pin - Tsubaki"){
@@ -375,6 +381,7 @@ export class World {
                                 scenes.forEach(c => {
                                     c.disableScene()
                                 })
+                                current360 = TsubakiScene
                                 TsubakiScene.enableScene()                               
                                 backButton.classList.add('visible')
                             } else if(current === "Pin - Dragon or"){
@@ -385,6 +392,7 @@ export class World {
                                 scenes.forEach(c => {
                                     c.disableScene()
                                 })
+                                current360 = DragonScene
                                 DragonScene.enableScene()                               
                                 backButton.classList.add('visible')
                             }
@@ -448,17 +456,30 @@ export class World {
             LezardsScene = new Scene360("Lezardscreation", vue1, renderer, canvas),
             CBScene = new Scene360("Côtes et Braises",vue2, renderer, canvas),
             TsubakiScene = new Scene360("Tsubaki", vue3, renderer, canvas),
-            DragonScene = new Scene360("Dragon d'or", vue4, renderer, canvas)
+            DragonScene = new Scene360("Dragon d'or", vue4, renderer, canvas),
+            Rest = new Scene360("Restaurant", vue4, renderer, canvas)
         ]
 
-        LezardsScene.createHotspot([
-            { HotspotName: "Amphi", position: new THREE.Vector3(-50,10,5)},
-            { HotspotName: "Restaurant", position: new THREE.Vector3(10,10,-50)},
+        Rest.createHotspot([
+            { HotspotName: "Réfectoire", position: new THREE.Vector3(100,10,-10), link: LezardsScene},
+        ])
+        .createInfo([
+            {InfoName: 'Cantine', position: new THREE.Vector3(23.5, 0, -31), element: '.popup__info-autre'},
+        ])
+        
+        LezardsScene
+        .createHotspot([
+            { HotspotName: "Amphi", position: new THREE.Vector3(-50,10,5), link: CBScene},
+            { HotspotName: "Restaurant", position: new THREE.Vector3(10,10,-50), link: Rest},
             { HotspotName: "Toilettes", position: new THREE.Vector3(10,10,50)}
+        ])
+        .createInfo([
+            {InfoName: 'Lampe', position: new THREE.Vector3(23.5, 0, -31), element: '.popup__info-lampe'},
+            {InfoName: 'Table', position: new THREE.Vector3(68.5, -10, 0.15), element: '.popup__info-table'},
         ])
 
         CBScene.createHotspot([
-            { HotspotName: "Toilettes", position: new THREE.Vector3(-50,10,11)},
+            { HotspotName: "Toilettes", position: new THREE.Vector3(-50,10,11), link: LezardsScene},
         ])
 
         TsubakiScene.createHotspot([
@@ -506,14 +527,13 @@ export class World {
             // Render
             if(activeCamera === 0){
                 composer.render(scene, camera)
-            } else if(activeCamera === 1){
-                CBScene.render()
-            } else if(activeCamera === 2){
-                LezardsScene.render()
-            } else if(activeCamera === 3){
-                TsubakiScene.render()
-            } else if(activeCamera === 4){
-                DragonScene.render()
+            } else {
+                current360.show()
+                if(current360.child){
+                    current360.disableScene()
+                    current360 = current360.child
+                    current360.enableScene()
+                }
             }
             stats.end()
         }
