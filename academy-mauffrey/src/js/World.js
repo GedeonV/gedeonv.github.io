@@ -76,7 +76,7 @@ export class World {
         mainScene = new THREE.Scene()
         scene = mainScene
 
-        mainScene.background = new Color('0xffffff')
+        mainScene.background = new Color('0xdddddd')
         
         const axesHelper = new THREE.AxesHelper( 50 );
         scene.add( axesHelper );
@@ -146,6 +146,10 @@ export class World {
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.physicallyCorrectLights = true;
         renderer.toneMappingExposure = 1;
+        renderer.colorManagement=true
+
+        renderer.gammaInput = true;
+        renderer.gammaOutput = true;
 
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -187,6 +191,7 @@ export class World {
                         child.traverse(c => {
                             if (c.isMesh){ 
                                 c.castShadow = true;
+                                if(c.material.map) c.material.map.anisotropy = 16; 
                             }
                         })
                     }
@@ -195,14 +200,16 @@ export class World {
                         child.traverse(c => {
                             if (c.isMesh){ 
                                 c.castShadow = true;
+                                if(c.material.map) c.material.map.anisotropy = 16; 
                             }
                         })
                     }
 
-                    if(child.name === 'Batiment_2_et_3'){
+                    if(child.name === "Batiments_2_et_3"){
                         child.traverse(c => {
                             if (c.isMesh){ 
                                 c.castShadow = true;
+                                if(c.material.map) c.material.map.anisotropy = 16; 
                             }
                         })
                     }
@@ -231,6 +238,10 @@ export class World {
                 mixer.addEventListener("finished", function(e){
                     console.log(e)
                     activeCamera = 1
+
+                    setTimeout(() => {
+                        controls.autoRotate = true
+                    }, 2500)
                 })
             }
         };
@@ -257,7 +268,7 @@ export class World {
         const ambient = new THREE.AmbientLight(0xFFFFFF, 0.3);
         scene.add(ambient)
 
-        const directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
+        const directionalLight = new THREE.DirectionalLight(0xffa95c, 1);
         directionalLight.castShadow = true;
         
         directionalLight.shadow.camera.top = 100;
@@ -266,10 +277,10 @@ export class World {
         directionalLight.shadow.camera.right = 100;
         directionalLight.shadow.camera.near = 0.1;
         directionalLight.shadow.camera.far = 250;
-        directionalLight.shadow.bias = 0.0001;
+        directionalLight.shadow.bias = -0.0001;
 
-        directionalLight.shadow.mapSize.width = 1024
-        directionalLight.shadow.mapSize.height = 1024
+        directionalLight.shadow.mapSize.width = 2048
+        directionalLight.shadow.mapSize.height = 2048
         
         directionalLight.position.set(0, 65, 80);
         scene.add(directionalLight);
@@ -280,7 +291,20 @@ export class World {
         const lightHelper = new THREE.DirectionalLightHelper( directionalLight, 5 );
         scene.add(lightHelper);
 
-    
+        const spotlight = new THREE.SpotLight(0xffa95c,4);
+        spotlight.position.set(0,65,80);
+        spotlight.castShadow = true;
+        scene.add( spotlight );
+
+        spotlight.shadow.bias = -0.0001;
+        spotlight.shadow.mapSize.width = 1024*4;
+        spotlight.shadow.mapSize.height = 1024*4;
+
+        const spotlightHelperShadow = new THREE.CameraHelper( directionalLight.shadow.camera );
+        scene.add( spotlightHelperShadow );
+
+        var light = new THREE.HemisphereLight(0xffeeb1, 0x080820, 4);
+        scene.add(light);    
         /**
          * Keybinds
          */
@@ -494,6 +518,7 @@ export class World {
             }
 
             lightHelperShadow.update()
+            spotlightHelperShadow.update()
 
             stats.end()
         }
@@ -503,36 +528,58 @@ export class World {
          */
 
         gui = new dat.GUI()
-        gui.add(ambient, 'intensity', 0, 1)       
 
-        gui.add(directionalLight, 'intensity', 0, 5) 
+        let amb = gui.addFolder('Lumière Ambiante')
+        amb.add(ambient, 'intensity', 0, 1)       
+        amb.addColor(ambient,'color')
+
+
+        let dir = gui.addFolder('Lumière Directionnelle');
+        dir.add(directionalLight, 'intensity', 0, 5) 
+        dir.addColor(directionalLight,'color')
+        dir.add(directionalLight, 'castShadow')
         
-        gui.add(directionalLight.shadow.camera, 'top', -300, 300).onChange(val => {
+        dir.add(directionalLight.shadow.camera, 'top', -300, 300).onChange(val => {
             directionalLight.shadow.camera.updateProjectionMatrix();
         })
 
-        gui.add(directionalLight.shadow.camera, 'right', -300, 300).onChange(val => {
+        dir.add(directionalLight.shadow.camera, 'right', -300, 300).onChange(val => {
             directionalLight.shadow.camera.updateProjectionMatrix();
         }) 
 
-        gui.add(directionalLight.shadow.camera, 'bottom', -300, 300) .onChange(val => {
+        dir.add(directionalLight.shadow.camera, 'bottom', -300, 300) .onChange(val => {
             directionalLight.shadow.camera.updateProjectionMatrix();
         })
 
-        gui.add(directionalLight.shadow.camera, 'left', -300, 300) .onChange(val => {
+        dir.add(directionalLight.shadow.camera, 'left', -300, 300) .onChange(val => {
             directionalLight.shadow.camera.updateProjectionMatrix();
         })
 
-        gui.add(directionalLight.shadow.camera, 'near', 0, 1).onChange(val => {
+        dir.add(directionalLight.shadow.camera, 'near', 0, 1).onChange(val => {
             directionalLight.shadow.camera.updateProjectionMatrix();
         })
 
-        gui.add(directionalLight.shadow.camera, 'far', 5, 1000).onChange(val => {
+        dir.add(directionalLight.shadow.camera, 'far', 5, 1000).onChange(val => {
             directionalLight.shadow.camera.updateProjectionMatrix();
         }) 
         
-        gui.add(directionalLight.position, 'x', -300, 300) 
-        gui.add(directionalLight.position, 'y', -300, 300) 
-        gui.add(directionalLight.position, 'z', -300, 300) 
+        dir.add(directionalLight.position, 'x', -300, 300) 
+        dir.add(directionalLight.position, 'y', -300, 300) 
+        dir.add(directionalLight.position, 'z', -300, 300) 
+
+        let hem = gui.addFolder('Hemisphere')
+        hem.addColor(light,'color')
+        hem.addColor(light,'groundColor')
+        hem.add(light, 'intensity', 0, 5)
+
+
+        let spot = gui.addFolder('Projecteur') 
+        spot.add(spotlight, 'intensity', 0, 5) 
+        spot.addColor(spotlight,'color')
+        spot.add(spotlight, 'castShadow')
+
+        spot.add(spotlight.position, 'x', -300, 300) 
+        spot.add(spotlight.position, 'y', -300, 300) 
+        spot.add(spotlight.position, 'z', -300, 300) 
     }
 }
