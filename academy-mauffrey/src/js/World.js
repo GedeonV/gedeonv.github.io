@@ -76,9 +76,9 @@ export class World {
         mainScene = new THREE.Scene()
         scene = mainScene
 
-        mainScene.background = new Color('0x3F3F3F')
+        mainScene.background = new Color('0xffffff')
         
-        const axesHelper = new THREE.AxesHelper( 5 );
+        const axesHelper = new THREE.AxesHelper( 50 );
         scene.add( axesHelper );
     
         /**
@@ -107,24 +107,22 @@ export class World {
          * Camera
          */
         camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 1000)
-        // camera.position.set(2, 2, 2)
-
         camera.position.set(-107.99894247141552, 75.83479260248458, -127.7151015822532)
-        // camera.getWorldDirection(new THREE.Vector3(0.7595899940570272, -0.3944633343974142, 0.5171283387559793));
-
 
         camera.rotation.order = 'YXZ';
         scene.add(camera)
     
         const helper = new THREE.CameraHelper(camera);
-        scene.add(helper);
+        // scene.add(helper);
 
         /**
          * Controls
          */
-        // controls = new OrbitControls(camera, canvas)
-        // controls.enableDamping = true
-        // controls.enablePan = false
+        controls = new OrbitControls(camera, canvas)
+        controls.enableDamping = true
+        controls.enablePan = false
+        controls.maxPolarAngle = (Math.PI / 4)
+        controls.minPolarAngle = (Math.PI / 4)
 
         /**
          * Loaders 
@@ -146,6 +144,7 @@ export class World {
 
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.physicallyCorrectLights = true;
         renderer.toneMappingExposure = 1;
 
         renderer.shadowMap.enabled = true;
@@ -154,7 +153,6 @@ export class World {
         /**
          * Models 
          */
-    
         dracoLoader.setDecoderPath('/draco/')
         gltfLoader.setDRACOLoader(dracoLoader)
     
@@ -172,56 +170,46 @@ export class World {
                 const children = [...gltf.scene.children]
                 console.log(gltf)
                 animCamera = gltf.cameras[0]
+
                 for(const child of children)
                 {   
-                    if(child.children.length > 0){
-                        // console.log(child.children[0])
-                        if(child.children[0].type == 'DirectionalLight'){
-                            console.log(child.children[0])
-                            child.children[0].castShadow = true
-                            child.children[0].shadow.bias = 0.0001
-                        }
+                    if(child.name === 'Autres_plans'){
+                        child.receiveShadow = true
+                    }
+                    console.log(child)
+
+                    if(child.name === 'Plan_principal'){
+                        console.log(child)
+                        child.receiveShadow = true
                     }
 
-                    if(child.material){
-                        child.castShadow = true;
-
-                        if(child.name === 'Plane'){
-                            child.receiveShadow = true;
-                        }
-
-                        
-                    } 
-
-                    if(child.name !== 'Cube'){
-                        mainScene.add(child)        
+                    if(child.name === 'Bâtiment_principal'){
+                        child.traverse(c => {
+                            if (c.isMesh){ 
+                                c.castShadow = true;
+                            }
+                        })
                     }
+
+                    if(child.name === "Bâtiments_4_et_5"){
+                        child.traverse(c => {
+                            if (c.isMesh){ 
+                                c.castShadow = true;
+                            }
+                        })
+                    }
+
+                    if(child.name === 'Batiment_2_et_3'){
+                        child.traverse(c => {
+                            if (c.isMesh){ 
+                                c.castShadow = true;
+                            }
+                        })
+                    }
+
+                    mainScene.add(child)
                     mainScene.updateMatrixWorld(true);
                 }
-
-                // console.log(pins)
-                // if(pins.length > 0){
-                //     currentView = pins[0]
-                //     pins[0].geometry.computeBoundingBox()
-                //     var boundingBox = pins[0].geometry.boundingBox;
-    
-                //     target.subVectors(boundingBox.max, boundingBox.min)
-                //     target.multiplyScalar(0.5)
-                //     target.add(boundingBox.min)
-                //     target.applyMatrix4(pins[0].matrixWorld)
-    
-                //     console.log(target)
-                //     camera.position.set(target.x - 2, 5, target.z - 2)
-                //     controls.target.set(target.x, 1, target.z)
-                //     controls.maxPolarAngle = (Math.PI / 4)
-                //     controls.minPolarAngle = (Math.PI / 4)
-    
-                //     controls.minDistance = 2
-                //     controls.maxDistance = 2
-    
-                //     controls.autoRotate = true;
-                //     controls.autoRotateSpeed = 2.5
-                // }
             },
             (xhr) => {
                 console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -234,41 +222,18 @@ export class World {
         THREE.DefaultLoadingManager.onLoad = function ( ) {
             console.log( 'Loading Complete!');
             divLoader.classList.add('loaded');
-            if(mixer){
-                mixer.addEventListener("finished", function(e){
-                    console.log(e)
-                    console.log(animCamera)
-
-                    animCamera.updateMatrixWorld();
-
-                    // let vector = new THREE.Vector3(); // create once and reuse it!
-                    // let direction = animCamera.getWorldDirection(vector);
-                    // console.log(direction)
-
-                    // var vector2 = animCamera.position.clone();
-                    // vector2.applyMatrix4(animCamera.matrixWorld);
-                    // console.log(vector2)
-
-                    // camera.position.set(new THREE.Vector3(-107.99894247141552, 75.83479260248458, -127.7151015822532))
-                    // camera.getWorldDirection(new THREE.Vector3(0.7595899940570272, -0.3944633343974142, 0.5171283387559793));
-
-                    controls = new OrbitControls(animCamera, canvas)
-                    controls.enableDamping = true
-                    controls.enablePan = false
-                })
-            }
-
-
+            
             setTimeout(() => {
                 action.play()
             }, 1000)
+
+            if(mixer){
+                mixer.addEventListener("finished", function(e){
+                    console.log(e)
+                    activeCamera = 1
+                })
+            }
         };
-
-
-        
-        
-
-
 
         /**
          * Raycaster
@@ -288,28 +253,32 @@ export class World {
         /**
          * Lights
          */
-        const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
-        scene.add(hemiLight)
-        
-        // const directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
-        // directionalLight.castShadow = true;
-        
-        // directionalLight.shadow.camera.top = 300;
-        // directionalLight.shadow.camera.bottom = - 300;
-        // directionalLight.shadow.camera.left = - 300;
-        // directionalLight.shadow.camera.right = 300;
-        // directionalLight.shadow.camera.near = 0.1;
-        // directionalLight.shadow.camera.far = 3500;
-        // directionalLight.shadow.bias = 0.0001;
 
-        // directionalLight.shadow.mapSize.width = 2048
-        // directionalLight.shadow.mapSize.height = 2048
-        
-        // directionalLight.position.set(105, 75, -120);
-        // scene.add(directionalLight);
+        const ambient = new THREE.AmbientLight(0xFFFFFF, 0.3);
+        scene.add(ambient)
 
-        // const lightHelper = new THREE.CameraHelper( directionalLight.shadow.camera)
-        // scene.add(lightHelper);
+        const directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
+        directionalLight.castShadow = true;
+        
+        directionalLight.shadow.camera.top = 100;
+        directionalLight.shadow.camera.bottom = - 100;
+        directionalLight.shadow.camera.left = - 100;
+        directionalLight.shadow.camera.right = 100;
+        directionalLight.shadow.camera.near = 0.1;
+        directionalLight.shadow.camera.far = 250;
+        directionalLight.shadow.bias = 0.0001;
+
+        directionalLight.shadow.mapSize.width = 1024
+        directionalLight.shadow.mapSize.height = 1024
+        
+        directionalLight.position.set(0, 65, 80);
+        scene.add(directionalLight);
+
+        const lightHelperShadow = new THREE.CameraHelper( directionalLight.shadow.camera );
+        scene.add( lightHelperShadow );
+
+        const lightHelper = new THREE.DirectionalLightHelper( directionalLight, 5 );
+        scene.add(lightHelper);
 
     
         /**
@@ -523,7 +492,9 @@ export class World {
                     current360.enableScene()
                 }
             }
-            // lightHelper.update()
+
+            lightHelperShadow.update()
+
             stats.end()
         }
 
@@ -532,8 +503,36 @@ export class World {
          */
 
         gui = new dat.GUI()
-        // gui.add(directionalLight.position, 'x', -500, 500)        
-        // gui.add(directionalLight.position, 'y', -500, 500)        
-        // gui.add(directionalLight.position, 'z', -500, 500)        
+        gui.add(ambient, 'intensity', 0, 1)       
+
+        gui.add(directionalLight, 'intensity', 0, 5) 
+        
+        gui.add(directionalLight.shadow.camera, 'top', -300, 300).onChange(val => {
+            directionalLight.shadow.camera.updateProjectionMatrix();
+        })
+
+        gui.add(directionalLight.shadow.camera, 'right', -300, 300).onChange(val => {
+            directionalLight.shadow.camera.updateProjectionMatrix();
+        }) 
+
+        gui.add(directionalLight.shadow.camera, 'bottom', -300, 300) .onChange(val => {
+            directionalLight.shadow.camera.updateProjectionMatrix();
+        })
+
+        gui.add(directionalLight.shadow.camera, 'left', -300, 300) .onChange(val => {
+            directionalLight.shadow.camera.updateProjectionMatrix();
+        })
+
+        gui.add(directionalLight.shadow.camera, 'near', 0, 1).onChange(val => {
+            directionalLight.shadow.camera.updateProjectionMatrix();
+        })
+
+        gui.add(directionalLight.shadow.camera, 'far', 5, 1000).onChange(val => {
+            directionalLight.shadow.camera.updateProjectionMatrix();
+        }) 
+        
+        gui.add(directionalLight.position, 'x', -300, 300) 
+        gui.add(directionalLight.position, 'y', -300, 300) 
+        gui.add(directionalLight.position, 'z', -300, 300) 
     }
 }
