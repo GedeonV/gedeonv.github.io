@@ -16,7 +16,7 @@ import * as dat from 'dat.gui'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
-import models from '../../static/models/academy-mauffrey.glb'
+import models from '../../static/models/academy-mauffreyv27.glb'
 
 
 import { Color, Object3D, TextureLoader, Vector3 } from 'three'
@@ -45,7 +45,8 @@ THREE.DefaultLoadingManager.onError = function ( url ) {
 
 export class World {
     constructor(canvas){
-        var scene, scenes, camera, controls, composer, transition, renderer, gui, animCamera, action, mixer, clip
+        var scene, scenes, camera, controls, composer, transition, renderer, gui
+        var animations, animCamera, actions, mixer, traveling, movingCamion1, movingCamion2, movingCamion3, movingCamion4, movingCamion5
         var mainScene, current360
 
         var activeCamera = 0
@@ -121,8 +122,8 @@ export class World {
         controls = new OrbitControls(camera, canvas)
         controls.enableDamping = true
         controls.enablePan = false
-        controls.maxPolarAngle = (Math.PI / 4)
-        controls.minPolarAngle = (Math.PI / 4)
+        // controls.maxPolarAngle = (Math.PI / 4)
+        // controls.minPolarAngle = (Math.PI / 4)
 
         /**
          * Loaders 
@@ -142,10 +143,10 @@ export class World {
         renderer.setSize(sizes.width, sizes.height)
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMapping = THREE.ReinhardToneMapping;
         renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.physicallyCorrectLights = true;
-        renderer.toneMappingExposure = 1;
+        renderer.toneMappingExposure = 2.3;
         renderer.colorManagement=true
 
         renderer.gammaInput = true;
@@ -153,6 +154,23 @@ export class World {
 
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+        /**
+         * Actions
+         */
+
+        this.updateAllActions = () => {
+            actions.forEach(action => {
+                action.clampWhenFinished = true;
+            })
+        }
+
+        this.playAllActions = () => {
+            actions.forEach(action => {
+                action.play()
+            })
+        }
+
 
         /**
          * Models 
@@ -166,14 +184,25 @@ export class World {
         gltfLoader.load(models,
             (gltf) => {
                 mixer = new THREE.AnimationMixer(gltf.scene)
-                clip = THREE.AnimationClip.findByName(gltf.animations, "CameraAction")
-                console.log(clip)
-                action = mixer.clipAction(clip).setLoop(THREE.LoopOnce);
-                action.clampWhenFinished = true;
+                animations = gltf.animations
+                
+                traveling = mixer.clipAction(animations[0]).setLoop(THREE.LoopOnce);
+                movingCamion1 = mixer.clipAction(animations[1]).setLoop(THREE.LoopOnce);
+                movingCamion2 = mixer.clipAction(animations[2]).setLoop(THREE.LoopOnce);
+                movingCamion3 = mixer.clipAction(animations[3]).setLoop(THREE.LoopOnce);
+                movingCamion4 = mixer.clipAction(animations[4]).setLoop(THREE.LoopOnce);
+                movingCamion5 = mixer.clipAction(animations[5]).setLoop(THREE.LoopOnce);
+
+                actions = [traveling, movingCamion1, movingCamion2, movingCamion3, movingCamion4, movingCamion5];
+                this.updateAllActions()
 
                 const children = [...gltf.scene.children]
                 console.log(gltf)
                 animCamera = gltf.cameras[0]
+                // camera.copy(animCamera)
+                // let helper = new THREE.CameraHelper( animCamera );
+                // scene.add(helper)
+
 
                 for(const child of children)
                 {   
@@ -205,6 +234,24 @@ export class World {
                         })
                     }
 
+                    if(child.name === "Voitures"){
+                        child.traverse(c => {
+                            if (c.isMesh){ 
+                                c.castShadow = true;
+                                if(c.material.map) c.material.map.anisotropy = 16; 
+                            }
+                        })
+                    }
+
+                    if(child.name === "Camions"){
+                        child.traverse(c => {
+                            if (c.isMesh){ 
+                                c.castShadow = true;
+                                if(c.material.map) c.material.map.anisotropy = 16; 
+                            }
+                        })
+                    }
+
                     if(child.name === "Batiments_2_et_3"){
                         child.traverse(c => {
                             if (c.isMesh){ 
@@ -226,25 +273,42 @@ export class World {
             }
         )
 
-        THREE.DefaultLoadingManager.onLoad = function ( ) {
+        THREE.DefaultLoadingManager.onLoad = () => {
             console.log( 'Loading Complete!');
             divLoader.classList.add('loaded');
             
             setTimeout(() => {
-                action.play()
+                this.playAllActions()
             }, 1000)
 
             if(mixer){
                 mixer.addEventListener("finished", function(e){
-                    console.log(e)
-                    activeCamera = 1
+                    let clip = e.action.getClip()
+                    if(clip.name === "CameraAction"){
+                        var vector = new THREE.Vector3(0, 0, 0);
+                        let direction = animCamera.getWorldDirection(vector);
+                        console.log(direction)
 
-                    setTimeout(() => {
-                        controls.autoRotate = true
-                    }, 2500)
+                        let raycaster = new THREE.Raycaster();
+                        raycaster.setFromCamera(new THREE.Vector2(), animCamera);
+                        const intersects = raycaster.intersectObjects(scene.children)
+                        let point = intersects[0].point 
+                        scene.add(new THREE.ArrowHelper(raycaster.ray.direction, raycaster.ray.origin, 300, 0xff0000) );
+                        controls.target.set(point.x, point.y, point.z)
+                        activeCamera = 1
+
+                        setTimeout(() => {
+                            controls.autoRotate = true
+                        }, 2500)
+                    }
+
+                    // activeCamera = 1
+
+                    
                 })
             }
         };
+
 
         /**
          * Raycaster
@@ -285,11 +349,11 @@ export class World {
         directionalLight.position.set(0, 65, 80);
         scene.add(directionalLight);
 
-        const lightHelperShadow = new THREE.CameraHelper( directionalLight.shadow.camera );
-        scene.add( lightHelperShadow );
+        // const lightHelperShadow = new THREE.CameraHelper( directionalLight.shadow.camera );
+        // scene.add( lightHelperShadow );
 
-        const lightHelper = new THREE.DirectionalLightHelper( directionalLight, 5 );
-        scene.add(lightHelper);
+        // const lightHelper = new THREE.DirectionalLightHelper( directionalLight, 5 );
+        // scene.add(lightHelper);
 
         const spotlight = new THREE.SpotLight(0xffa95c,4);
         spotlight.position.set(0,65,80);
@@ -300,11 +364,12 @@ export class World {
         spotlight.shadow.mapSize.width = 1024*4;
         spotlight.shadow.mapSize.height = 1024*4;
 
-        const spotlightHelperShadow = new THREE.CameraHelper( directionalLight.shadow.camera );
-        scene.add( spotlightHelperShadow );
+        // const spotlightHelperShadow = new THREE.CameraHelper( directionalLight.shadow.camera );
+        // scene.add( spotlightHelperShadow );
 
         var light = new THREE.HemisphereLight(0xffeeb1, 0x080820, 4);
         scene.add(light);    
+
         /**
          * Keybinds
          */
@@ -517,8 +582,8 @@ export class World {
                 }
             }
 
-            lightHelperShadow.update()
-            spotlightHelperShadow.update()
+            // lightHelperShadow.update()
+            // spotlightHelperShadow.update()
 
             stats.end()
         }
@@ -537,7 +602,7 @@ export class World {
         let dir = gui.addFolder('Lumière Directionnelle');
         dir.add(directionalLight, 'intensity', 0, 5) 
         dir.addColor(directionalLight,'color')
-        dir.add(directionalLight, 'castShadow')
+        dir.add(spotlight, 'castShadow')
         
         dir.add(directionalLight.shadow.camera, 'top', -300, 300).onChange(val => {
             directionalLight.shadow.camera.updateProjectionMatrix();
